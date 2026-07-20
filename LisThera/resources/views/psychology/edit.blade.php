@@ -39,34 +39,34 @@
                 <div class="form-grid-2">
                     <div class="form-group">
                         <label>Praticante <span class="required">*</span></label>
-                        <select name="practitionerid" required>
+                        <select name="practitioner_id" required>
                             <option value="">Selecione...</option>
                             @foreach($praticantes as $p)
-                                <option value="{{ $p->id }}" {{ $av->practitionerid == $p->id ? 'selected' : '' }}>{{ $p->fullname }}</option>
+                                <option value="{{ $p->id }}" {{ $av->practitioner_id == $p->id ? 'selected' : '' }}>{{ $p->name }}</option>
                             @endforeach
                         </select>
                     </div>
                     <div class="form-group">
                         <label>Data da Avaliação <span class="required">*</span></label>
-                        <input type="date" name="assessedat" required
-                            value="{{ $av->assessedat?->format('Y-m-d') ?? date('Y-m-d') }}">
+                        <input type="date" name="assessment_date" required
+                            value="{{ $av->assessment_date ? \Carbon\Carbon::parse($av->assessment_date)->format('Y-m-d') : date('Y-m-d') }}">
                     </div>
                     <div class="form-group">
                         <label>Psicólogo Responsável</label>
-                        <select name="therapistid">
+                        <select name="therapist_id">
                             <option value="">Selecione...</option>
                             @foreach($terapeutas as $t)
-                                <option value="{{ $t->id }}" {{ $av->therapistid == $t->id ? 'selected' : '' }}>{{ $t->fullname }}</option>
+                                <option value="{{ $t->id }}" {{ $av->therapist_id == $t->id ? 'selected' : '' }}>{{ $t->name }}</option>
                             @endforeach
                         </select>
                     </div>
                     <div class="form-group">
                         <label>Sessão de Arena (opcional)</label>
-                        <select name="arenasessionid">
+                        <select name="arena_session_id">
                             <option value="">Selecione...</option>
                             @foreach($sessoes as $s)
-                                <option value="{{ $s->id }}" {{ $av->arenasessionid == $s->id ? 'selected' : '' }}>
-                                    Sessão #{{ $s->id }} — {{ $s->startedat?->format('d/m/Y') ?? 'S/D' }}
+                                <option value="{{ $s->id }}" {{ $av->arena_session_id == $s->id ? 'selected' : '' }}>
+                                    Sessão #{{ $s->id }} — {{ $s->started_at ? \Carbon\Carbon::parse($s->started_at)->format('d/m/Y') : 'S/D' }}
                                 </option>
                             @endforeach
                         </select>
@@ -84,14 +84,14 @@
                 <div class="domains-grid">
                     @php
                     $dominios = [
-                        'emotionalregulation' => ['Regulação Emocional',   'Reconhece e regula emoções durante a sessão'],
-                        'socialinteraction'   => ['Interação Social',       'Qualidade das interações'],
-                        'communication'       => ['Comunicação',            'Expressão verbal e não-verbal'],
-                        'attentionfocus'      => ['Atenção / Foco',         'Mantém atenção nas tarefas propostas'],
-                        'behavioralresponse'  => ['Resp. Comportamental',  'Resposta a comandos e situações novas'],
-                        'anxietylevel'        => ['Nível de Ansiedade',     '0 = sem ansiedade, 10 = ansiedade máxima'],
-                        'motivation'          => ['Motivação',              'Engajamento e vontade de participar'],
-                        'selfesteem'          => ['Autoestima',             'Autoconfiança e autoimagem positiva'],
+                        'emotional_regulation' => ['Regulação Emocional',   'Reconhece e regula emoções durante a sessão'],
+                        'social_interaction'   => ['Interação Social',       'Qualidade das interações'],
+                        'communication'        => ['Comunicação',            'Expressão verbal e não-verbal'],
+                        'attention_focus'      => ['Atenção / Foco',         'Mantém atenção nas tarefas propostas'],
+                        'behavioral_response'  => ['Resp. Comportamental',  'Resposta a comandos e situações novas'],
+                        'anxiety_level'        => ['Nível de Ansiedade',     '0 = sem ansiedade, 10 = ansiedade máxima'],
+                        'motivation'           => ['Motivação',              'Engajamento e vontade de participar'],
+                        'self_esteem'          => ['Autoestima',             'Autoconfiança e autoimagem positiva'],
                     ];
                     @endphp
                     @foreach($dominios as $field => [$label, $hint])
@@ -119,17 +119,17 @@
             <div class="tab-pane" id="aba3">
                 <div class="form-grid-2">
                     <div class="form-group"><label>CID</label><input type="text" name="cid" value="{{ $av->cid }}"></div>
-                    <div class="form-group"><label>Data do Diagnóstico</label><input type="date" name="datadiagnostico" value="{{ $av->datadiagnostico }}"></div>
-                    <div class="form-group col-span-2"><label>Profissional do Diagnóstico</label><input type="text" name="profissionaldiagnostico" value="{{ $av->profissionaldiagnostico }}"></div>
+                    <div class="form-group"><label>Data do Diagnóstico</label><input type="date" name="diagnosis_date" value="{{ $av->diagnosis_date }}"></div>
+                    <div class="form-group col-span-2"><label>Profissional do Diagnóstico</label><input type="text" name="diagnosis_professional" value="{{ $av->diagnosis_professional }}"></div>
                     <div class="form-group">
                         <label>Usa Medicação?</label>
                         <div class="radio-group">
-                            <label><input type="radio" name="usamedicacao" value="1" {{ $av->usamedicacao ? 'checked' : '' }}> Sim</label>
-                            <label><input type="radio" name="usamedicacao" value="0" {{ !$av->usamedicacao ? 'checked' : '' }}> Não</label>
+                            <label><input type="radio" name="uses_medication" value="1" {{ $av->uses_medication ? 'checked' : '' }}> Sim</label>
+                            <label><input type="radio" name="uses_medication" value="0" {{ !$av->uses_medication ? 'checked' : '' }}> Não</label>
                         </div>
                     </div>
-                    <div class="form-group col-span-2"><label>Medicação e Dosagem</label><textarea name="medicacaodosagem" rows="2">{{ $av->medicacaodosagem }}</textarea></div>
-                    <div class="form-group col-span-2"><label>Tratamento Específico</label><textarea name="tratamentoespecifico" rows="2">{{ $av->tratamentoespecifico }}</textarea></div>
+                    <div class="form-group col-span-2"><label>Medicação e Dosagem</label><textarea name="medication_dosage" rows="2">{{ $av->medication_dosage }}</textarea></div>
+                    <div class="form-group col-span-2"><label>Tratamento Específico</label><textarea name="specific_treatment" rows="2">{{ $av->specific_treatment }}</textarea></div>
                 </div>
                 <div class="tab-nav-footer">
                     <button type="button" class="btn btn-ghost tab-prev" data-prev="aba2">← Anterior</button>
@@ -141,13 +141,13 @@
             <div class="tab-pane" id="aba4">
                 <div class="section-title">Sono</div>
                 <div class="form-grid-2">
-                    @foreach(['sonorecem'=>'Sono Recém-Nascido','sonoatual'=>'Sono Atual','ondedorme'=>'Onde Dorme'] as $f=>$l)
+                    @foreach(['sleep_newborn'=>'Sono Recém-Nascido','sleep_current'=>'Sono Atual','sleep_location'=>'Onde Dorme'] as $f=>$l)
                     <div class="form-group"><label>{{ $l }}</label><textarea name="{{ $f }}" rows="2">{{ $av->{$f} }}</textarea></div>
                     @endforeach
                 </div>
                 <div class="section-title mt-4">Cognitivo</div>
                 <div class="form-grid-2">
-                    @foreach(['percepcao'=>'Percepção','atencaoconcentracao'=>'Atenção e Concentração','memoria'=>'Memória','conceitos'=>'Conceitos'] as $f=>$l)
+                    @foreach(['perception'=>'Percepção','attention_concentration'=>'Atenção e Concentração','memory'=>'Memória','concepts'=>'Conceitos'] as $f=>$l)
                     <div class="form-group"><label>{{ $l }}</label><textarea name="{{ $f }}" rows="2">{{ $av->{$f} }}</textarea></div>
                     @endforeach
                 </div>
@@ -160,7 +160,7 @@
             {{-- ABA 5 --}}
             <div class="tab-pane" id="aba5">
                 <div class="form-grid-2">
-                    @php $linguagem=['linguagemverbalfuncional'=>'Linguagem Verbal Funcional','linguagemdialogo'=>'Diálogo','linguagemimitasons'=>'Imita Sons','linguagemletrassilabas'=>'Letras e Sílabas','linguagemleituraescrita'=>'Leitura e Escrita','linguagemnumeros'=>'Números','linguagemoperacoes'=>'Operações Matemáticas']; @endphp
+                    @php $linguagem=['language_verbal_functional'=>'Linguagem Verbal Funcional','language_dialogue'=>'Diálogo','language_imitates_sounds'=>'Imita Sons','language_letters_syllables'=>'Letras e Sílabas','language_reading_writing'=>'Leitura e Escrita','language_numbers'=>'Números','language_math_operations'=>'Operações Matemáticas']; @endphp
                     @foreach($linguagem as $f=>$l)
                     <div class="form-group"><label>{{ $l }}</label><textarea name="{{ $f }}" rows="2">{{ $av->{$f} }}</textarea></div>
                     @endforeach
@@ -174,7 +174,7 @@
             {{-- ABA 6 --}}
             <div class="tab-pane" id="aba6">
                 <div class="form-grid-2">
-                    @php $sociais=['contatovisual'=>'Contato Visual','interacao'=>'Interação','brincar'=>'Brincar','humor'=>'Humor','frustracao'=>'Frustração','comportamentoagressivo'=>'Comportamento Agressivo','aceitaregras'=>'Aceita Regras','reacaoresponsaveis'=>'Reação aos Responsáveis','compreensaocertoerrado'=>'Compreensão Certo/Errado','atividadesvidadiaria'=>'Atividades de Vida Diária']; @endphp
+                    @php $sociais=['eye_contact'=>'Contato Visual','interaction'=>'Interação','play'=>'Brincar','mood'=>'Humor','frustration'=>'Frustração','aggressive_behavior'=>'Comportamento Agressivo','accepts_rules'=>'Aceita Regras','reaction_to_guardians'=>'Reação aos Responsáveis','right_wrong_understanding'=>'Compreensão Certo/Errado','daily_life_activities'=>'Atividades de Vida Diária']; @endphp
                     @foreach($sociais as $f=>$l)
                     <div class="form-group"><label>{{ $l }}</label><textarea name="{{ $f }}" rows="2">{{ $av->{$f} }}</textarea></div>
                     @endforeach
@@ -188,13 +188,13 @@
             {{-- ABA 7 --}}
             <div class="tab-pane" id="aba7">
                 <div class="form-grid-2">
-                    @foreach(['comportamentoestereotipado'=>'Comportamento Estereotipado','mania'=>'Mania','objetofixacao'=>'Objeto de Fixação','medos'=>'Medos'] as $f=>$l)
+                    @foreach(['stereotyped_behavior'=>'Comportamento Estereotipado','mania'=>'Mania','fixation_object'=>'Objeto de Fixação','fears'=>'Medos'] as $f=>$l)
                     <div class="form-group"><label>{{ $l }}</label><textarea name="{{ $f }}" rows="2">{{ $av->{$f} }}</textarea></div>
                     @endforeach
-                    <div class="form-group col-span-2"><label>Principais Queixas</label><textarea name="principaisqueixas" rows="3">{{ $av->principaisqueixas }}</textarea></div>
-                    <div class="form-group"><label>Escore Geral (0–100)</label><input type="number" name="overallscore" min="0" max="100" value="{{ $av->overallscore }}"></div>
-                    <div class="form-group col-span-2"><label>Evolução Clínica</label><textarea name="evolutionnotes" rows="3">{{ $av->evolutionnotes }}</textarea></div>
-                    <div class="form-group col-span-2"><label>Observações da Sessão</label><textarea name="sessionnotes" rows="3">{{ $av->sessionnotes }}</textarea></div>
+                    <div class="form-group col-span-2"><label>Principais Queixas</label><textarea name="main_complaints" rows="3">{{ $av->main_complaints }}</textarea></div>
+                    <div class="form-group"><label>Escore Geral (0–100)</label><input type="number" name="overall_score" min="0" max="100" value="{{ $av->overall_score }}"></div>
+                    <div class="form-group col-span-2"><label>Evolução Clínica</label><textarea name="evolution_notes" rows="3">{{ $av->evolution_notes }}</textarea></div>
+                    <div class="form-group col-span-2"><label>Observações da Sessão</label><textarea name="session_notes" rows="3">{{ $av->session_notes }}</textarea></div>
                 </div>
                 <div class="tab-nav-footer">
                     <button type="button" class="btn btn-ghost tab-prev" data-prev="aba6">← Anterior</button>

@@ -12,7 +12,6 @@
     <div class="alert alert-success">{{ session('success') }}</div>
 @endif
 
-{{-- Busca --}}
 <div class="card mb-4">
     <div class="card-body">
         <form method="GET" action="{{ route('psychology.index') }}" class="search-form">
@@ -37,7 +36,6 @@
     </div>
 </div>
 
-{{-- Tabela --}}
 <div class="card">
     <div class="card-body p-0">
         <div class="table-responsive">
@@ -55,19 +53,19 @@
                     @forelse($avaliacoes as $av)
                     <tr>
                         <td>
-                            <span class="practitioner-name">{{ $av->practitioner?->fullname ?? '—' }}</span>
+                            <span class="practitioner-name">{{ $av->practitioner?->name ?? '—' }}</span>
                         </td>
-                        <td>{{ $av->assessedat?->format('d/m/Y') ?? '—' }}</td>
+                        <td>{{ $av->assessment_date ? \Carbon\Carbon::parse($av->assessment_date)->format('d/m/Y') : '—' }}</td>
                         <td>
-                            @if($av->overallscore !== null)
-                                <span class="badge {{ $av->overallscore >= 70 ? 'badge-green' : ($av->overallscore >= 40 ? 'badge-yellow' : 'badge-red') }}">
-                                    {{ $av->overallscore }}/100
+                            @if($av->overall_score !== null)
+                                <span class="badge {{ $av->overall_score >= 70 ? 'badge-green' : ($av->overall_score >= 40 ? 'badge-yellow' : 'badge-red') }}">
+                                    {{ $av->overall_score }}/100
                                 </span>
                             @else
                                 <span class="text-muted">—</span>
                             @endif
                         </td>
-                        <td>{{ $av->therapist?->fullname ?? '—' }}</td>
+                        <td>{{ $av->therapist?->name ?? '—' }}</td>
                         <td>
                             <div class="action-btns">
                                 <a href="{{ route('psychology.show', $av) }}" class="btn btn-sm btn-info">Ver</a>
