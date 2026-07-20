@@ -13,21 +13,25 @@ class DashboardController extends Controller
     public function index()
     {
         $stats = [
-            'practitioners' => Practitioner::count(),
-            'sessions_today' => ArenaSession::whereDate('startedat', today())->count(),
-            'checkins_today' => SessionCheckin::whereDate('checkedat', today())->count(),
-            'horses' => Horse::count(),
-            'therapists' => Therapist::count(),
-            'sessions_active' => ArenaSession::whereNull('endedat')->count(),
+            'practitioners'   => Practitioner::count(),
+            'sessions_today'  => ArenaSession::whereDate('started_at', today())->count(),
+            'checkins_today'  => SessionCheckin::whereDate('scheduled_at', today())->count(),
+            'horses'          => Horse::count(),
+            'therapists'      => Therapist::count(),
+            'sessions_active' => ArenaSession::where('status', 'in_progress')->count(),
         ];
 
-        $recent_sessions = ArenaSession::with(['practitioner', 'therapist', 'arena'])
-            ->orderByDesc('startedat')
+        $recent_sessions = ArenaSession::with([
+                'sessionCheckin.practitioner',
+                'startedByTherapist',
+                'arena',
+            ])
+            ->orderByDesc('started_at')
             ->limit(8)
             ->get();
 
         $recent_checkins = SessionCheckin::with('practitioner')
-            ->orderByDesc('checkedat')
+            ->orderByDesc('scheduled_at')
             ->limit(6)
             ->get();
 
