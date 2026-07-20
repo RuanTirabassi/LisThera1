@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Practitioner extends Model
 {
@@ -10,55 +11,33 @@ class Practitioner extends Model
     public $timestamps = false;
 
     protected $fillable = [
+        'rfidtag',
         'name',
-        'birth_date',
+        'birthdate',
         'gender',
-        'notes',
+        'allergy',
+        'isactive',
     ];
 
     protected $casts = [
-        'birth_date' => 'date',
+        'birthdate'  => 'date',
+        'isactive'   => 'boolean',
+        'createdat'  => 'datetime',
+        'updatedat'  => 'datetime',
     ];
 
-    public function diagnoses()
+    public function guardians(): HasMany
     {
-        return $this->hasMany(PractitionerDiagnosis::class, 'practitioner_id');
+        return $this->hasMany(PractitionerGuardian::class, 'practitionerid');
     }
 
-    public function guardians()
+    public function diagnoses(): HasMany
     {
-        return $this->hasMany(PractitionerGuardian::class, 'practitioner_id');
+        return $this->hasMany(PractitionerDiagnosis::class, 'practitionerid');
     }
 
-    public function clinicalHistory()
+    public function psychologyAssessments(): HasMany
     {
-        return $this->hasOne(PractitionerClinicalHistory::class, 'practitioner_id');
-    }
-
-    public function sessionCheckins()
-    {
-        return $this->hasMany(SessionCheckin::class, 'practitioner_id');
-    }
-
-    public function psychologyAssessments()
-    {
-        return $this->hasMany(PsychologyAssessment::class, 'practitioner_id');
-    }
-
-    public function physiotherapyAssessments()
-    {
-        return $this->hasMany(PhysiotherapyAssessment::class, 'practitioner_id');
-    }
-
-    public function pedagogyAssessments()
-    {
-        return $this->hasMany(PedagogyAssessment::class, 'practitioner_id');
-    }
-
-    public function getAgeAttribute()
-    {
-        return $this->birth_date
-            ? \Carbon\Carbon::parse($this->birth_date)->age
-            : null;
+        return $this->hasMany(PsychologyAssessment::class, 'practitionerid');
     }
 }

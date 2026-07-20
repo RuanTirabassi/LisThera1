@@ -34,6 +34,16 @@ class SessionMemoryCueEvent extends Model
         return $this->belongsTo(Therapist::class, 'therapistid');
     }
 
+    public function arenaSession(): BelongsTo
+    {
+        return $this->belongsTo(ArenaSession::class, 'arenasessionid');
+    }
+
+    public function arenaSessionMount(): BelongsTo
+    {
+        return $this->belongsTo(ArenaSessionMount::class, 'arenasessionmountid');
+    }
+
     public function psychologyAssessmentCueLinks(): HasMany
     {
         return $this->hasMany(PsychologyAssessmentCueLink::class, 'sessionmemorycueeventid');

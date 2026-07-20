@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Therapist extends Model
 {
@@ -10,12 +11,26 @@ class Therapist extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'fullname', 'specialization', 'registrationnumber',
-        'phonenumber', 'email',
+        'rfidtag',
+        'name',
+        'specialty',
+        'professionalreg',
+        'isactive',
     ];
 
-    public function arenaSessions()
+    protected $casts = [
+        'isactive'  => 'boolean',
+        'createdat' => 'datetime',
+        'updatedat' => 'datetime',
+    ];
+
+    public function memoryCueTemplates(): HasMany
     {
-        return $this->hasMany(ArenaSession::class, 'therapistid');
+        return $this->hasMany(MemoryCueTemplate::class, 'therapistid');
+    }
+
+    public function psychologyAssessments(): HasMany
+    {
+        return $this->hasMany(PsychologyAssessment::class, 'therapistid');
     }
 }

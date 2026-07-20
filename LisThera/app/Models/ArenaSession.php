@@ -3,68 +3,52 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ArenaSession extends Model
 {
-    protected $table = 'arena_sessions';
+    protected $table = 'arenasessions';
     public $timestamps = false;
 
     protected $fillable = [
-        'session_checkin_id',
-        'arena_id',
-        'started_by',
-        'started_at',
-        'ended_at',
+        'sessioncheckinid',
+        'arenaid',
         'status',
-        'notes',
+        'startedat',
+        'endedat',
+        'startedby',
+        'endedby',
     ];
 
     protected $casts = [
-        'started_at' => 'datetime',
-        'ended_at'   => 'datetime',
+        'startedat'  => 'datetime',
+        'endedat'    => 'datetime',
+        'createdat'  => 'datetime',
     ];
 
-    // Praticante chega via sessionCheckin
-    public function sessionCheckin()
+    public function arena(): BelongsTo
     {
-        return $this->belongsTo(SessionCheckin::class, 'session_checkin_id');
+        return $this->belongsTo(Arena::class, 'arenaid');
     }
 
-    public function arena()
+    public function sessionCheckin(): BelongsTo
     {
-        return $this->belongsTo(Arena::class, 'arena_id');
+        return $this->belongsTo(SessionCheckin::class, 'sessioncheckinid');
     }
 
-    // Terapeuta que iniciou a sessão
-    public function startedByTherapist()
+    public function memoryCueEvents(): HasMany
     {
-        return $this->belongsTo(Therapist::class, 'started_by');
+        return $this->hasMany(SessionMemoryCueEvent::class, 'arenasessionid');
     }
 
-    public function arenaEntities()
+    public function psychologyAssessments(): HasMany
     {
-        return $this->hasMany(ArenaSessionEntity::class, 'arena_session_id');
+        return $this->hasMany(PsychologyAssessment::class, 'arenasessionid');
     }
 
-    public function mounts()
+    public function mounts(): HasMany
     {
-        return $this->hasMany(ArenaSessionMount::class, 'arena_session_id');
-    }
-
-    public function memoryCueEvents()
-    {
-        return $this->hasMany(SessionMemoryCueEvent::class, 'arena_session_id');
-    }
-
-    public function getIsActiveAttribute()
-    {
-        return $this->status === 'in_progress';
-    }
-
-    public function getDurationAttribute()
-    {
-        if (!$this->started_at) return null;
-        $end = $this->ended_at ?? now();
-        return $this->started_at->diffInMinutes($end);
+        return $this->hasMany(ArenaSessionMount::class, 'arenasessionid');
     }
 }

@@ -8,11 +8,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PsychologyAssessment extends Model
 {
-    // Nome real da tabela no BD (sem underscores)
     protected $table = 'psychologyassessments';
     public $timestamps = false;
-
-    // Chave primária padrão: id
     protected $primaryKey = 'id';
 
     protected $fillable = [
@@ -20,57 +17,26 @@ class PsychologyAssessment extends Model
         'arenasessionid',
         'therapistid',
         'assessmentdate',
-        'emotionalregulation',
-        'socialinteraction',
-        'communication',
-        'attentionfocus',
-        'behavioralresponse',
-        'anxietylevel',
-        'motivation',
-        'selfesteem',
-        'cid',
-        'profissionaldiagnostico',
-        'datadiagnostico',
-        'usamedicacao',
-        'medicacaodosagem',
-        'tratamentoespecifico',
-        'sonorecem',
-        'sonoatual',
-        'ondedorme',
-        'percepcao',
-        'atencaoconcentracao',
-        'memoria',
-        'conceitos',
-        'linguagemverbalfuncional',
-        'linguagemdialogo',
-        'linguagemimitasons',
-        'linguagemletrassilabas',
-        'linguagemleituraescrita',
-        'linguagemnumeros',
-        'linguagemoperacoes',
-        'contatovisual',
-        'interacao',
-        'brincar',
-        'humor',
-        'frustracao',
-        'comportamentoagressivo',
-        'aceitaregras',
-        'reacaoresponsaveis',
-        'compreensaocertoerrado',
-        'atividadesvidadiaria',
-        'comportamentoestereotipado',
-        'mania',
-        'objetofixacao',
-        'medos',
-        'principaisqueixas',
-        'overallscore',
-        'evolutionnotes',
-        'sessionnotes',
+        'vabscommunication',
+        'vabssocialization',
+        'vabsdailyliving',
+        'vabsmotorskills',
+        'interactionwithhorse',
+        'touchacceptance',
+        'impulsecontrol',
+        'instructionfollowing',
+        'currentmedication',
+        'maincomplaints',
+        'createdat',
+        'updatedat',
+        'deletedat',
     ];
 
     protected $casts = [
-        'assessmentdate' => 'datetime',
-        'usamedicacao'   => 'boolean',
+        'assessmentdate' => 'date',
+        'createdat'      => 'datetime',
+        'updatedat'      => 'datetime',
+        'deletedat'      => 'datetime',
     ];
 
     public function practitioner(): BelongsTo
