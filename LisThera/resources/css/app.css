@@ -145,3 +145,72 @@ body { min-height: 100dvh; }
 }
 .segmented span { padding: 7px 14px; font-size: .88rem; cursor: pointer; }
 .segmented span.active { background: var(--accent); color: #fff; }
+
+/* ============================================
+   Psychology Index — estilos adicionais
+   ============================================ */
+
+.page-hero { display:flex; justify-content:space-between; align-items:flex-start; gap:18px; margin-bottom:20px; padding:24px; background:linear-gradient(180deg,#fff,#f7f3eb); border:1px solid var(--border); border-radius:18px; }
+.page-hero h1 { font-size:1.5rem; font-weight:700; margin-bottom:4px; }
+.page-hero-actions { display:flex; gap:10px; align-items:center; flex-shrink:0; }
+
+.section-kicker { display:inline-flex; margin-bottom:10px; padding:5px 10px; border-radius:999px; background:#e6f4f1; color:var(--accent); font-size:.75rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; }
+
+.page-subtitle { margin-top:6px; color:var(--muted); max-width:62ch; font-size:.92rem; }
+
+.feedback-banner { margin-bottom:18px; padding:14px 16px; border-radius:12px; border:1px solid var(--border); font-size:.92rem; font-weight:600; }
+.feedback-banner.success { background:#edf6ea; color:#2f5d18; border-color:#cfe1c8; }
+
+.filter-card, .table-card { margin-bottom:18px; }
+
+.section-head { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:18px; }
+.section-head h2 { margin:0 0 4px; font-size:1rem; font-weight:600; color:var(--text); }
+.section-head p { margin:0; color:var(--muted); font-size:.88rem; }
+
+.filter-grid { display:grid; grid-template-columns:minmax(240px,1.2fr) minmax(200px,.8fr) auto; gap:14px; align-items:end; }
+.filter-actions { display:flex; gap:10px; flex-wrap:wrap; }
+
+.btn { display:inline-flex; align-items:center; justify-content:center; gap:6px; padding:10px 16px; border-radius:10px; border:1px solid var(--border); background:var(--surface); color:var(--text); font-size:.9rem; font-weight:600; text-decoration:none; cursor:pointer; transition:background .15s, border-color .15s; }
+.btn:hover { background:var(--bg); }
+.btn-secondary { background:#f4f1ec; color:var(--text); border-color:var(--border); }
+.btn-secondary:hover { background:#ede9e3; }
+.btn-outline { background:transparent; color:var(--accent); border-color:color-mix(in srgb, var(--accent) 35%, var(--border)); }
+.btn-outline:hover { background:#e6f4f1; }
+.btn-danger-soft { background:#fdf0f0; color:#9e2f2f; border-color:#efcdcd; }
+.btn-danger-soft:hover { background:#fce4e4; }
+.btn-sm { padding:7px 12px; font-size:.82rem; }
+
+.table-wrap { overflow-x:auto; }
+.data-table { width:100%; border-collapse:collapse; }
+.data-table thead th { padding:11px 16px; text-align:left; font-size:.82rem; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; border-bottom:1px solid var(--border); white-space:nowrap; }
+.data-table tbody td { padding:14px 16px; font-size:.92rem; border-bottom:1px solid var(--border); vertical-align:middle; }
+.data-table tbody tr:last-child td { border-bottom:none; }
+.data-table tbody tr:hover td { background:var(--bg); }
+
+.psychology-table th.actions-col, .psychology-table td:last-child { width:230px; }
+
+.person-cell { display:flex; align-items:center; gap:12px; }
+.person-avatar { width:36px; height:36px; border-radius:999px; display:inline-flex; align-items:center; justify-content:center; background:#e6f4f1; color:var(--accent); font-size:.88rem; font-weight:700; flex-shrink:0; }
+.cell-subtext { display:block; margin-top:2px; color:var(--muted); font-size:.78rem; }
+
+.score-badge { display:inline-flex; align-items:center; justify-content:center; min-width:80px; padding:5px 12px; border-radius:999px; font-size:.8rem; font-weight:700; }
+.score-good { background:#e9f5e3; color:#356b18; }
+.score-medium { background:#fbf1df; color:#8a6114; }
+.score-low { background:#f9e3e3; color:#982d2d; }
+.text-muted { color:var(--muted); font-size:.88rem; }
+
+.table-actions { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+.table-actions form { margin:0; }
+
+.empty-state-cell { padding:36px 20px !important; text-align:center; }
+.empty-state-inline { display:grid; gap:8px; }
+.empty-state-inline strong { font-size:.96rem; color:var(--text); }
+.empty-state-inline span { color:var(--muted); font-size:.88rem; }
+
+.pagination-wrap { padding:16px 20px; border-top:1px solid var(--border); }
+
+@media (max-width:900px) {
+  .page-hero { flex-direction:column; align-items:stretch; }
+  .section-head { flex-direction:column; }
+  .filter-grid { grid-template-columns:1fr; }
+}
