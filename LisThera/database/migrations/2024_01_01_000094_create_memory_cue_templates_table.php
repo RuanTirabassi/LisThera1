@@ -10,13 +10,17 @@ return new class extends Migration
     {
         Schema::create('memory_cue_templates', function (Blueprint $table) {
             $table->id();
-            $table->string('code', 30)->unique()->comment('e.g. PSYC_01, FISIO_02');
-            $table->string('label', 120);
-            $table->enum('category', ['psychology','physiotherapy','pedagogy','general']);
-            $table->text('description')->nullable();
+            $table->foreignId('therapist_id')->constrained('therapists')->onDelete('cascade');
+            $table->string('cue_key', 50);
+            $table->string('cue_label', 20);
+            $table->string('category', 50)->nullable();
+            $table->enum('polarity', ['positive', 'negative', 'neutral'])->nullable();
             $table->boolean('is_active')->default(true);
-            $table->timestamp('created_at')->nullable()->useCurrent();
-            $table->timestamp('updated_at')->nullable()->useCurrentOnUpdate();
+            $table->timestamp('created_at')->nullable();
+            $table->timestamp('updated_at')->nullable();
+
+            $table->unique(['therapist_id', 'cue_key'], 'uq_template_owner_key');
+            $table->index(['therapist_id', 'polarity'], 'idx_mct_therapist_polarity');
         });
     }
 
