@@ -10,13 +10,15 @@ return new class extends Migration
     {
         Schema::create('iot_devices', function (Blueprint $table) {
             $table->id();
-            $table->string('device_uid', 100)->unique();
-            $table->string('label', 100)->nullable();
-            $table->enum('type', ['heart_rate', 'accelerometer', 'temperature', 'other'])->default('other');
+            $table->enum('device_type', ['esp32_s3'])->default('esp32_s3');
+            $table->string('mac_address', 17)->unique();
+            $table->foreignId('arena_id')->nullable()->constrained('arenas')->onDelete('set null');
             $table->boolean('is_active')->default(true);
-            $table->timestamp('last_seen_at')->nullable();
+            $table->dateTime('last_seen_at')->nullable();
+            $table->string('firmware_version', 50)->nullable();
+            $table->text('notes')->nullable();
             $table->timestamp('created_at')->nullable()->useCurrent();
-            $table->timestamp('updated_at')->nullable()->useCurrentOnUpdate();
+            $table->timestamp('updated_at')->nullable();
         });
     }
 
