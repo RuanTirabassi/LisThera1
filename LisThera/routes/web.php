@@ -1,49 +1,49 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PractitionerController;
-use App\Http\Controllers\SessionCheckinController;
 use App\Http\Controllers\ArenaSessionController;
+use App\Http\Controllers\SessionCheckinController;
 use App\Http\Controllers\MemoryCueController;
+use App\Http\Controllers\PsychologyAssessmentController;
 
-// ─── Redireciona raiz para dashboard ──────────────────────────────────────────
-Route::get('/', fn () => redirect()->route('dashboard'));
-
-// ─── Rotas abertas para teste (sem autenticação) ───────────────────────────────
+// Auth
+Route::get('/login',  [AuthController::class, 'showLogin'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/logout',[AuthController::class, 'logout'])->name('logout');
 
 // Dashboard
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+Route::get('/', fn() => redirect()->route('dashboard'));
 
 // Praticantes
-Route::resource('practitioners', PractitionerController::class)
-     ->only(['index', 'create', 'store', 'show', 'edit', 'update']);
+Route::get('/practitioners',         [PractitionerController::class, 'index'])->name('practitioners.index');
+Route::get('/practitioners/create',  [PractitionerController::class, 'create'])->name('practitioners.create');
+Route::post('/practitioners',        [PractitionerController::class, 'store'])->name('practitioners.store');
+Route::get('/practitioners/{practitioner}', [PractitionerController::class, 'show'])->name('practitioners.show');
+Route::get('/practitioners/{practitioner}/edit', [PractitionerController::class, 'edit'])->name('practitioners.edit');
+Route::put('/practitioners/{practitioner}',      [PractitionerController::class, 'update'])->name('practitioners.update');
 
-// Triagem (session checkin)
-Route::prefix('checkins')->name('checkins.')->group(function () {
-    Route::get('/',        [SessionCheckinController::class, 'index'])->name('index');
-    Route::get('/create',  [SessionCheckinController::class, 'create'])->name('create');
-    Route::post('/',       [SessionCheckinController::class, 'store'])->name('store');
-    Route::get('/{id}',    [SessionCheckinController::class, 'show'])->name('show');
-});
+// Sessions
+Route::get('/sessions',              [ArenaSessionController::class, 'index'])->name('sessions.index');
+Route::get('/sessions/create',       [ArenaSessionController::class, 'create'])->name('sessions.create');
+Route::post('/sessions',             [ArenaSessionController::class, 'store'])->name('sessions.store');
+Route::get('/sessions/{session}',    [ArenaSessionController::class, 'show'])->name('sessions.show');
+Route::post('/sessions/{session}/finish', [ArenaSessionController::class, 'finish'])->name('sessions.finish');
 
-// Sessões de arena
-Route::prefix('sessions')->name('sessions.')->group(function () {
-    Route::get('/',           [ArenaSessionController::class, 'index'])->name('index');
-    Route::get('/create',     [ArenaSessionController::class, 'create'])->name('create');
-    Route::post('/',          [ArenaSessionController::class, 'store'])->name('store');
-    Route::get('/{id}',       [ArenaSessionController::class, 'show'])->name('show');
-    Route::patch('/{id}/end', [ArenaSessionController::class, 'end'])->name('end');
-});
+// Check-ins
+Route::get('/checkins',              [SessionCheckinController::class, 'index'])->name('checkins.index');
+Route::get('/checkins/create',       [SessionCheckinController::class, 'create'])->name('checkins.create');
+Route::post('/checkins',             [SessionCheckinController::class, 'store'])->name('checkins.store');
+Route::get('/checkins/{checkin}',    [SessionCheckinController::class, 'show'])->name('checkins.show');
 
 // Memory Cues
-Route::prefix('cues')->name('cues.')->group(function () {
-    Route::get('/', [MemoryCueController::class, 'index'])->name('index');
-});
+Route::get('/cues',                  [MemoryCueController::class, 'index'])->name('cues.index');
+Route::get('/cues/{cue}',            [MemoryCueController::class, 'show'])->name('cues.show');
 
-// Memory Cues API
-Route::prefix('api/cues')->name('api.cues.')->group(function () {
-    Route::get('/templates',    [MemoryCueController::class, 'templates'])->name('templates');
-    Route::post('/',            [MemoryCueController::class, 'store'])->name('store');
-    Route::get('/session/{id}', [MemoryCueController::class, 'bySession'])->name('bySession');
-});
+// Psicologia
+Route::get('/psychology/{practitioner}/report', [PsychologyAssessmentController::class, 'report'])->name('psychology.report');
+Route::get('/sessions/{session}/psychology',    [PsychologyAssessmentController::class, 'create'])->name('psychology.create');
+Route::post('/sessions/{session}/psychology',   [PsychologyAssessmentController::class, 'store'])->name('psychology.store');
