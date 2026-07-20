@@ -10,6 +10,12 @@
     </div>
     <div class="header-actions">
         <a href="{{ route('psychology.index') }}" class="btn btn-ghost">← Voltar</a>
+        <a href="{{ route('psychology.cues.index', $psychology) }}" class="btn btn-secondary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;vertical-align:-2px">
+                <path d="M9.663 17h4.673M12 3v1m6.364 1.636-.707.707M21 12h-1M4 12H3m3.343-5.657-.707-.707m2.828 9.9a5 5 0 1 1 7.072 0l-.548.547A3.374 3.374 0 0 0 14 18.469V19a2 2 0 1 1-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+            </svg>
+            Memory Cues
+        </a>
         <a href="{{ route('psychology.edit', $psychology) }}" class="btn btn-warning">Editar</a>
     </div>
 </div>
@@ -169,7 +175,9 @@
 .col-span-2 { grid-column:span 2; }
 .score-bar { background:var(--color-surface-offset); border-radius:var(--radius-full); height:7px; width:120px; overflow:hidden; }
 .score-fill { height:100%; border-radius:var(--radius-full); }
-.header-actions { display:flex; gap:var(--space-2); }
+.header-actions { display:flex; gap:var(--space-2); align-items:center; flex-wrap:wrap; }
+.btn-secondary { background:var(--color-surface-offset); color:var(--color-text); border:1px solid var(--color-border); }
+.btn-secondary:hover { background:var(--color-surface-dynamic); }
 @media(max-width:768px){ .show-grid{grid-template-columns:1fr;} .show-fields{grid-template-columns:1fr;} .col-span-2{grid-column:span 1;} }
 </style>
 @endsection
