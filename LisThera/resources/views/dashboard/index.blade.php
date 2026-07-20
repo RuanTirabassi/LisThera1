@@ -46,17 +46,17 @@
         <a href="{{ route('psychology.index') }}" class="assessment-shortcut" style="--c:#7c3aed">
             <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 1 7 7c0 3.5-2.5 6.4-5.8 7.7V19h-2.4v-2.3C7.5 15.4 5 12.5 5 9a7 7 0 0 1 7-7z"/><path d="M9.5 22h5"/></svg>
             <span class="shortcut-title">Psicologia</span>
-            <span class="shortcut-count">{{ $stats['assessments_psychology'] ?? '—' }} avaliações</span>
+            <span class="shortcut-count">{{ $stats['assessments_psychology'] ?? '0' }} avaliações</span>
         </a>
-        <a href="{{ route('pedagogy.index') }}" class="assessment-shortcut" style="--c:#059669">
+        <a href="/pedagogy" class="assessment-shortcut" style="--c:#059669">
             <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 19V6a2 2 0 0 1 2-2h13"/><path d="M18 2v17"/><path d="M8 10h6"/><path d="M8 14h4"/><rect x="2" y="17" width="20" height="4" rx="1"/></svg>
             <span class="shortcut-title">Pedagogia</span>
-            <span class="shortcut-count">{{ $stats['assessments_pedagogy'] ?? '—' }} avaliações</span>
+            <span class="shortcut-count">{{ $stats['assessments_pedagogy'] ?? '0' }} avaliações</span>
         </a>
-        <a href="{{ route('physiotherapy.index') }}" class="assessment-shortcut" style="--c:#0284c7">
+        <a href="/physiotherapy" class="assessment-shortcut" style="--c:#0284c7">
             <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="5" r="2"/><path d="M10 22V10.5L7 16h2v6"/><path d="M14 22V10.5l3 5.5h-2v6"/><path d="M10 10.5a4 4 0 0 1 4 0"/></svg>
             <span class="shortcut-title">Fisioterapia</span>
-            <span class="shortcut-count">{{ $stats['assessments_physiotherapy'] ?? '—' }} avaliações</span>
+            <span class="shortcut-count">{{ $stats['assessments_physiotherapy'] ?? '0' }} avaliações</span>
         </a>
     </div>
 </div>

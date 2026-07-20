@@ -51,8 +51,8 @@
             </div>
         </div>
         <div class="ac-actions">
-            <a href="{{ route('pedagogy.create') }}" class="btn btn-primary">+ Nova avaliação</a>
-            <a href="{{ route('pedagogy.index') }}" class="btn btn-secondary">Ver histórico</a>
+            <a href="/pedagogy/create" class="btn btn-primary">+ Nova avaliação</a>
+            <a href="/pedagogy" class="btn btn-secondary">Ver histórico</a>
         </div>
     </div>
 
@@ -74,14 +74,14 @@
             </div>
         </div>
         <div class="ac-actions">
-            <a href="{{ route('physiotherapy.create') }}" class="btn btn-primary">+ Nova avaliação</a>
-            <a href="{{ route('physiotherapy.index') }}" class="btn btn-secondary">Ver histórico</a>
+            <a href="/physiotherapy/create" class="btn btn-primary">+ Nova avaliação</a>
+            <a href="/physiotherapy" class="btn btn-secondary">Ver histórico</a>
         </div>
     </div>
 
 </div>
 
-{{-- Últimas avaliações de todas as especialidades --}}
+{{-- Últimas avaliações --}}
 <div class="card" style="margin-top:2rem">
     <div class="card-header">
         <h2>Últimas avaliações lançadas</h2>
@@ -117,7 +117,7 @@
                         @php $s = $row['score']; $cls = $s >= 70 ? 'badge-green' : ($s >= 40 ? 'badge-yellow' : 'badge-red'); @endphp
                         <span class="badge {{ $cls }}">{{ $s }}</span>
                     @else
-                        <span class="text-muted">—</span>
+                        <span class="text-muted">&mdash;</span>
                     @endif
                 </td>
                 <td>
