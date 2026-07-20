@@ -15,7 +15,6 @@ class PsychologyAssessment extends Model
         'arena_session_id',
         'therapist_id',
         'assessment_date',
-        // Domínios clínicos
         'emotionalregulation',
         'socialinteraction',
         'communication',
@@ -24,14 +23,12 @@ class PsychologyAssessment extends Model
         'anxietylevel',
         'motivation',
         'selfesteem',
-        // Diagnóstico
         'cid',
         'profissionaldiagnostico',
         'datadiagnostico',
         'usamedicacao',
         'medicacaodosagem',
         'tratamentoespecifico',
-        // Sono e cognição
         'sonorecem',
         'sonoatual',
         'ondedorme',
@@ -39,7 +36,6 @@ class PsychologyAssessment extends Model
         'atencaoconcentracao',
         'memoria',
         'conceitos',
-        // Linguagem
         'linguagemverbalfuncional',
         'linguagemdialogo',
         'linguagemimitasons',
@@ -47,7 +43,6 @@ class PsychologyAssessment extends Model
         'linguagemleituraescrita',
         'linguagemnumeros',
         'linguagemoperacoes',
-        // Aspectos sociais
         'contatovisual',
         'interacao',
         'brincar',
@@ -58,40 +53,38 @@ class PsychologyAssessment extends Model
         'reacaoresponsaveis',
         'compreensaocertoerrado',
         'atividadesvidadiaria',
-        // Comportamentos
         'comportamentoestereotipado',
         'mania',
         'objetofixacao',
         'medos',
         'principaisqueixas',
-        // Scores e notas finais
         'overallscore',
         'evolutionnotes',
         'sessionnotes',
     ];
 
     protected $casts = [
-        'assessedat'    => 'datetime',
-        'usamedicacao'  => 'boolean',
+        'assessment_date' => 'datetime',
+        'usamedicacao'    => 'boolean',
     ];
 
     public function practitioner()
     {
-        return $this->belongsTo(Practitioner::class, 'practitionerid');
+        return $this->belongsTo(Practitioner::class, 'practitioner_id');
     }
 
     public function therapist()
     {
-        return $this->belongsTo(Therapist::class, 'therapistid');
+        return $this->belongsTo(Therapist::class, 'therapist_id');
     }
 
     public function arenaSession()
     {
-        return $this->belongsTo(ArenaSession::class, 'arenasessionid');
+        return $this->belongsTo(ArenaSession::class, 'arena_session_id');
     }
 
     public function cueLinks()
     {
-        return $this->hasMany(PsychologyAssessmentCueLink::class, 'psychologyassessmentid');
+        return $this->hasMany(PsychologyAssessmentCueLink::class, 'psychology_assessment_id');
     }
 }

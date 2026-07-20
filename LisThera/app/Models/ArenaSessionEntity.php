@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ArenaSessionEntity extends Model
 {
-    protected $table = 'sessionarenaentities';
+    protected $table = 'session_arena_entities';
     protected $primaryKey = 'sessionarenaentityid';
     public $timestamps = false;
 

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class DiagnosisReference extends Model
 {
-    protected $table = 'diagnosisreference';
+    protected $table = 'diagnosis_reference';
     public $timestamps = false;
 
     protected $fillable = ['name', 'code', 'description'];
