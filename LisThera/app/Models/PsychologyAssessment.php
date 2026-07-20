@@ -3,18 +3,23 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PsychologyAssessment extends Model
 {
-    protected $table = 'psychology_assessments';
+    // Nome real da tabela no BD (sem underscores)
+    protected $table = 'psychologyassessments';
     public $timestamps = false;
 
+    // Chave primária padrão: id
+    protected $primaryKey = 'id';
+
     protected $fillable = [
-        'id',
-        'practitioner_id',
-        'arena_session_id',
-        'therapist_id',
-        'assessment_date',
+        'practitionerid',
+        'arenasessionid',
+        'therapistid',
+        'assessmentdate',
         'emotionalregulation',
         'socialinteraction',
         'communication',
@@ -64,27 +69,27 @@ class PsychologyAssessment extends Model
     ];
 
     protected $casts = [
-        'assessment_date' => 'datetime',
-        'usamedicacao'    => 'boolean',
+        'assessmentdate' => 'datetime',
+        'usamedicacao'   => 'boolean',
     ];
 
-    public function practitioner()
+    public function practitioner(): BelongsTo
     {
-        return $this->belongsTo(Practitioner::class, 'practitioner_id');
+        return $this->belongsTo(Practitioner::class, 'practitionerid');
     }
 
-    public function therapist()
+    public function therapist(): BelongsTo
     {
-        return $this->belongsTo(Therapist::class, 'therapist_id');
+        return $this->belongsTo(Therapist::class, 'therapistid');
     }
 
-    public function arenaSession()
+    public function arenaSession(): BelongsTo
     {
-        return $this->belongsTo(ArenaSession::class, 'arena_session_id');
+        return $this->belongsTo(ArenaSession::class, 'arenasessionid');
     }
 
-    public function cueLinks()
+    public function cueLinks(): HasMany
     {
-        return $this->hasMany(PsychologyAssessmentCueLink::class, 'psychology_assessment_id');
+        return $this->hasMany(PsychologyAssessmentCueLink::class, 'psychologyassessmentid');
     }
 }

@@ -8,8 +8,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class PsychologyAssessmentCueLink extends Model
 {
     protected $table = 'psychologyassessmentcuelinks';
-
-    // A tabela no BD usa createdat sem updated_at
     public $timestamps = false;
 
     protected $fillable = [
