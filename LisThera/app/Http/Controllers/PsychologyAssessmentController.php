@@ -16,23 +16,23 @@ class PsychologyAssessmentController extends Controller
 
         if ($request->filled('nome')) {
             $query->whereHas('practitioner', function ($q) use ($request) {
-                $q->where('fullname', 'like', '%' . $request->nome . '%');
+                $q->where('name', 'like', '%' . $request->nome . '%');
             });
         }
 
         if ($request->filled('data')) {
-            $query->whereDate('assessedat', $request->data);
+            $query->whereDate('assessment_date', $request->data);
         }
 
-        $avaliacoes = $query->orderByDesc('assessedat')->paginate(15)->appends($request->only(['nome', 'data']));
+        $avaliacoes = $query->orderByDesc('assessment_date')->paginate(15)->appends($request->only(['nome', 'data']));
 
         return view('psychology.index', compact('avaliacoes'));
     }
 
     public function create()
     {
-        $praticantes = Practitioner::orderBy('fullname')->get();
-        $terapeutas  = Therapist::orderBy('fullname')->get();
+        $praticantes = Practitioner::orderBy('name')->get();
+        $terapeutas  = Therapist::orderBy('name')->get();
         $sessoes     = ArenaSession::orderByDesc('id')->limit(50)->get();
 
         return view('psychology.create', compact('praticantes', 'terapeutas', 'sessoes'));
@@ -41,8 +41,8 @@ class PsychologyAssessmentController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'practitionerid' => 'required|exists:practitioners,id',
-            'assessedat'     => 'required|date',
+            'practitioner_id' => 'required|exists:practitioners,id',
+            'assessment_date' => 'required|date',
         ]);
 
         PsychologyAssessment::create($request->except('_token'));
@@ -59,8 +59,8 @@ class PsychologyAssessmentController extends Controller
     public function edit(PsychologyAssessment $psychology)
     {
         $psychology->load(['practitioner', 'therapist']);
-        $praticantes = Practitioner::orderBy('fullname')->get();
-        $terapeutas  = Therapist::orderBy('fullname')->get();
+        $praticantes = Practitioner::orderBy('name')->get();
+        $terapeutas  = Therapist::orderBy('name')->get();
         $sessoes     = ArenaSession::orderByDesc('id')->limit(50)->get();
 
         return view('psychology.edit', compact('psychology', 'praticantes', 'terapeutas', 'sessoes'));
@@ -69,8 +69,8 @@ class PsychologyAssessmentController extends Controller
     public function update(Request $request, PsychologyAssessment $psychology)
     {
         $request->validate([
-            'practitionerid' => 'required|exists:practitioners,id',
-            'assessedat'     => 'required|date',
+            'practitioner_id' => 'required|exists:practitioners,id',
+            'assessment_date' => 'required|date',
         ]);
 
         $psychology->update($request->except(['_token', '_method']));
