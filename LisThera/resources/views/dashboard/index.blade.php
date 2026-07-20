@@ -55,11 +55,21 @@
             </thead>
             <tbody>
                 @forelse($recent_sessions as $s)
+                @php
+                    $practitioner = $s->sessionCheckin?->practitioner;
+                    $therapist    = $s->startedByTherapist;
+                @endphp
                 <tr>
-                    <td><a href="{{ route('practitioners.show', $s->practitioner?->id) }}">{{ $s->practitioner?->fullname ?? '—' }}</a></td>
-                    <td>{{ $s->therapist?->fullname ?? '—' }}</td>
-                    <td>{{ $s->arena?->name ?? '—' }}</td>
-                    <td>{{ $s->startedat?->format('d/m H:i') }}</td>
+                    <td>
+                        @if($practitioner)
+                            <a href="{{ route('practitioners.show', $practitioner->id) }}">{{ $practitioner->name }}</a>
+                        @else
+                            <span class="text-muted">&mdash;</span>
+                        @endif
+                    </td>
+                    <td>{{ $therapist?->name ?? '&mdash;' }}</td>
+                    <td>{{ $s->arena?->name ?? '&mdash;' }}</td>
+                    <td>{{ $s->started_at?->format('d/m H:i') ?? '&mdash;' }}</td>
                     <td>
                         @if($s->is_active)
                             <span class="badge badge-green">Ativa</span>
@@ -85,22 +95,24 @@
             <thead>
                 <tr>
                     <th>Praticante</th>
-                    <th>Hora</th>
-                    <th>Dor</th>
+                    <th>Agendado</th>
+                    <th>Humor</th>
                     <th>Autorizado</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($recent_checkins as $c)
                 <tr>
-                    <td>{{ $c->practitioner?->fullname ?? '—' }}</td>
-                    <td>{{ $c->checkedat?->format('d/m H:i') }}</td>
-                    <td>{{ $c->painlevel ?? '—' }}/10</td>
+                    <td>{{ $c->practitioner?->name ?? '&mdash;' }}</td>
+                    <td>{{ $c->scheduled_at?->format('d/m H:i') ?? '&mdash;' }}</td>
+                    <td>{{ $c->practitioner_mood_pre ?? '&mdash;' }}</td>
                     <td>
-                        @if($c->sessionauthorized)
+                        @if($c->is_authorized_to_ride === 'yes')
                             <span class="badge badge-green">Sim</span>
-                        @else
+                        @elseif($c->is_authorized_to_ride === 'no')
                             <span class="badge badge-red">N&atilde;o</span>
+                        @else
+                            <span class="badge badge-gray">Pendente</span>
                         @endif
                     </td>
                 </tr>
