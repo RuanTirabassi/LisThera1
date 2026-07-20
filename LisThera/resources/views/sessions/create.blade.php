@@ -1,14 +1,51 @@
 @extends('layouts.app')
-@section('title', 'Nova Sessão | LisThera')
-@section('page-title', 'Nova Sessão')
+@section('title', 'Nova Sessão em Arena | LisThera')
+@section('page-title', 'Iniciar Sessão em Arena')
 @section('content')
-  <div class="panel" style="margin-bottom:16px"><h2>Iniciar sessão</h2><p>Selecione praticante, terapeuta, cavalo e arena para a sessão.</p></div>
-  <form class="form" method="POST" action="{{ route('sessions.store') }}">
+<div class="panel" style="margin-bottom:16px">
+    <h2>Sessão em Arena</h2>
+    <p>Vincule uma triagem autorizada a uma arena para iniciar a sessão.</p>
+</div>
+
+<form class="form" method="POST" action="{{ route('sessions.store') }}">
     @csrf
-    <div class="field"><label>Praticante</label><select name="practitioner_id"><option>Maria Silva</option><option>João Pedro</option></select></div>
-    <div class="field"><label>Terapeuta</label><select name="therapist_id"><option>Dra. Camila</option><option>Dr. Lucas</option></select></div>
-    <div class="field"><label>Cavalo</label><select name="horse_id"><option>Estrela</option><option>Trovão</option></select></div>
-    <div class="field"><label>Arena</label><select name="arena_id"><option>Arena 1</option><option>Arena 2</option></select></div>
-    <button type="submit" class="btn-primary">Iniciar sessão</button>
-  </form>
+
+    <div class="field">
+        <label for="session_checkin_id">Triagem (praticante autorizado)</label>
+        <select name="session_checkin_id" id="session_checkin_id" required>
+            <option value="">Selecione a triagem...</option>
+            @foreach($checkins as $c)
+                <option value="{{ $c->id }}">
+                    #{{ $c->id }} — {{ $c->practitioner?->name ?? 'Praticante' }}
+                    ({{ $c->scheduled_at ? \Carbon\Carbon::parse($c->scheduled_at)->format('d/m H:i') : '' }})
+                </option>
+            @endforeach
+        </select>
+    </div>
+
+    <div class="field">
+        <label for="arena_id">Arena / Pista</label>
+        <select name="arena_id" id="arena_id">
+            <option value="">Selecione...</option>
+            @foreach($arenas as $a)
+                <option value="{{ $a->id }}">{{ $a->name }}</option>
+            @endforeach
+        </select>
+    </div>
+
+    <div class="field">
+        <label for="started_by">Terapeuta responsável</label>
+        <select name="started_by" id="started_by" required>
+            <option value="">Selecione...</option>
+            @foreach($therapists as $t)
+                <option value="{{ $t->id }}">{{ $t->name }}</option>
+            @endforeach
+        </select>
+    </div>
+
+    <div style="margin-top:16px">
+        <button type="submit" class="btn-primary">Iniciar sessão</button>
+        <a href="{{ route('sessions.index') }}" class="btn">Cancelar</a>
+    </div>
+</form>
 @endsection

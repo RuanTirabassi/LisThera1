@@ -1,12 +1,10 @@
 @extends('layouts.app')
-
-@section('title', $practitioner->fullname)
-
+@section('title', $practitioner->name)
 @section('content')
 <div class="page-header">
     <div>
         <a href="{{ route('practitioners.index') }}" class="back-link">&larr; Praticantes</a>
-        <h1>{{ $practitioner->fullname }}</h1>
+        <h1>{{ $practitioner->name }}</h1>
     </div>
     <a href="{{ route('practitioners.edit', $practitioner->id) }}" class="btn btn-primary">Editar</a>
 </div>
@@ -16,67 +14,96 @@
         <h2>Dados pessoais</h2>
         <dl class="info-list">
             <dt>Data de nascimento</dt>
-            <dd>{{ $practitioner->birthdate ? \Carbon\Carbon::parse($practitioner->birthdate)->format('d/m/Y') : '—' }}
-                @if($practitioner->age) ({{ $practitioner->age }} anos) @endif
-            </dd>
-            <dt>Telefone</dt>
-            <dd>{{ $practitioner->phonenumber ?? '—' }}</dd>
-            <dt>Endere&ccedil;o</dt>
-            <dd>{{ $practitioner->address ?? '—' }}</dd>
-            <dt>RFID Token</dt>
-            <dd><code>{{ $practitioner->rfidtoken ?? '—' }}</code></dd>
-            <dt>Observa&ccedil;&otilde;es</dt>
-            <dd>{{ $practitioner->notes ?? '—' }}</dd>
+            <dd>{{ $practitioner->birth_date ? \Carbon\Carbon::parse($practitioner->birth_date)->format('d/m/Y') : '—' }}</dd>
+            <dt>Gênero</dt>
+            <dd>{{ $practitioner->gender ?? '—' }}</dd>
+            <dt>Alergias</dt>
+            <dd>{{ $practitioner->allergy ?? '—' }}</dd>
+            <dt>Tag RFID</dt>
+            <dd><code>{{ $practitioner->rfid_tag ?? '—' }}</code></dd>
+            <dt>Ativo</dt>
+            <dd>{{ $practitioner->is_active ? 'Sim' : 'Não' }}</dd>
         </dl>
     </div>
 
     <div class="card">
-        <h2>Diagn&oacute;sticos</h2>
+        <h2>Histórico clínico</h2>
+        @if($practitioner->clinicalHistory)
+        <dl class="info-list">
+            <dt>Gestação planejada</dt>
+            <dd>{{ $practitioner->clinicalHistory->pregnancy_planned ?? '—' }}</dd>
+            <dt>Gestação tranquila</dt>
+            <dd>{{ $practitioner->clinicalHistory->pregnancy_peaceful ?? '—' }}</dd>
+            <dt>Parto</dt>
+            <dd>{{ $practitioner->clinicalHistory->delivery ?? '—' }}</dd>
+            <dt>Tem irmãos?</dt>
+            <dd>{{ $practitioner->clinicalHistory->has_siblings ?? '—' }}</dd>
+            <dt>Relacionamento com irmãos</dt>
+            <dd>{{ $practitioner->clinicalHistory->siblings_relationship ?? '—' }}</dd>
+            <dt>Membros do domicílio</dt>
+            <dd>{{ $practitioner->clinicalHistory->household_members ?? '—' }}</dd>
+        </dl>
+        @else
+        <p class="text-muted">Histórico não preenchido.</p>
+        @endif
+    </div>
+
+    <div class="card">
+        <h2>Diagnósticos</h2>
         @forelse($practitioner->diagnoses as $d)
-        <div class="diag-item">
-            <span class="badge badge-blue">{{ $d->diagnosisReference?->code }}</span>
-            <strong>{{ $d->diagnosisReference?->name }}</strong>
-            @if($d->diagnoseddate)
-                <span class="text-muted">{{ \Carbon\Carbon::parse($d->diagnoseddate)->format('d/m/Y') }}</span>
-            @endif
-            @if($d->notes)<p>{{ $d->notes }}</p>@endif
+        <div class="diag-item" style="margin-bottom:8px">
+            <span class="badge badge-blue">{{ $d->diagnosisRef?->code ?? '—' }}</span>
+            <strong>{{ $d->diagnosisRef?->description ?? '—' }}</strong>
         </div>
         @empty
-        <p class="text-muted">Nenhum diagn&oacute;stico registrado.</p>
+        <p class="text-muted">Nenhum diagnóstico registrado.</p>
         @endforelse
     </div>
 
     <div class="card">
-        <h2>Respons&aacute;veis</h2>
+        <h2>Responsáveis</h2>
         @forelse($practitioner->guardians as $g)
-        <div class="guardian-item">
-            <strong>{{ $g->fullname }}</strong>
-            <span class="badge">{{ $g->relationship }}</span><br>
-            {{ $g->phonenumber }} {{ $g->email }}
+        <div class="guardian-item" style="margin-bottom:8px">
+            <strong>{{ $g->name }}</strong><br>
+            @if($g->birth_date)
+                <span class="text-muted">Nasc.: {{ \Carbon\Carbon::parse($g->birth_date)->format('d/m/Y') }}</span><br>
+            @endif
+            @if($g->phone) <span>{{ $g->phone }}</span><br> @endif
+            @if($g->profession) <span class="text-muted">{{ $g->profession }}</span> @endif
         </div>
         @empty
-        <p class="text-muted">Nenhum respons&aacute;vel cadastrado.</p>
+        <p class="text-muted">Nenhum responsável cadastrado.</p>
         @endforelse
     </div>
 
-    <div class="card">
+    <div class="card" style="grid-column: 1 / -1">
         <div class="card-header">
-            <h2>Hist&oacute;rico de sess&otilde;es</h2>
+            <h2>Histórico de sessões</h2>
             <a href="{{ route('sessions.index') }}">Ver todas</a>
         </div>
         <table class="data-table">
-            <thead><tr><th>Data</th><th>Terapeuta</th><th>Arena</th><th>Dura&ccedil;&atilde;o</th><th></th></tr></thead>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Arena</th>
+                    <th>Status</th>
+                    <th>Início</th>
+                    <th>Fim</th>
+                    <th></th>
+                </tr>
+            </thead>
             <tbody>
                 @forelse($practitioner->arenaSessions->take(8) as $s)
                 <tr>
-                    <td>{{ $s->startedat?->format('d/m/Y H:i') }}</td>
-                    <td>{{ $s->therapist?->fullname ?? '—' }}</td>
+                    <td>{{ $s->id }}</td>
                     <td>{{ $s->arena?->name ?? '—' }}</td>
-                    <td>{{ $s->duration }} min</td>
+                    <td>{{ $s->status }}</td>
+                    <td>{{ $s->started_at ? \Carbon\Carbon::parse($s->started_at)->format('d/m/Y H:i') : '—' }}</td>
+                    <td>{{ $s->ended_at ? \Carbon\Carbon::parse($s->ended_at)->format('H:i') : '—' }}</td>
                     <td><a href="{{ route('sessions.show', $s->id) }}" class="btn btn-sm">Ver</a></td>
                 </tr>
                 @empty
-                <tr><td colspan="5" class="empty">Nenhuma sess&atilde;o.</td></tr>
+                <tr><td colspan="6" class="empty">Nenhuma sessão.</td></tr>
                 @endforelse
             </tbody>
         </table>

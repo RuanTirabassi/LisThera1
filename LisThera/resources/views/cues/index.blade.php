@@ -1,29 +1,47 @@
 @extends('layouts.app')
-
-@section('title', 'Memory Cue Templates')
-
+@section('title', 'Memory Cues | LisThera')
+@section('page-title', 'Templates de Memory Cues')
 @section('content')
 <div class="page-header">
-    <h1>Memory Cue Templates</h1>
+    <h1>Memory Cues</h1>
+    <a href="{{ route('cues.create') }}" class="btn btn-primary">+ Novo cue</a>
 </div>
 
-@php $grouped = $templates->groupBy('category'); @endphp
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Terapeuta</th>
+            <th>Chave</th>
+            <th>Rótulo</th>
+            <th>Categoria</th>
+            <th>Polaridade</th>
+            <th>Ativo</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @forelse($cues as $c)
+        <tr>
+            <td>{{ $c->id }}</td>
+            <td>{{ $c->therapist?->name ?? '—' }}</td>
+            <td><code>{{ $c->cue_key }}</code></td>
+            <td>{{ $c->cue_label }}</td>
+            <td>{{ $c->category ?? '—' }}</td>
+            <td>
+                @php
+                    $pol = ['positive'=>'badge-green','negative'=>'badge-red','neutral'=>'badge-gray'];
+                @endphp
+                <span class="badge {{ $pol[$c->polarity] ?? '' }}">{{ $c->polarity ?? '—' }}</span>
+            </td>
+            <td>{{ $c->is_active ? 'Sim' : 'Não' }}</td>
+            <td><a href="{{ route('cues.show', $c->id) }}" class="btn btn-sm">Ver</a></td>
+        </tr>
+        @empty
+        <tr><td colspan="8" class="empty">Nenhum template registrado.</td></tr>
+        @endforelse
+    </tbody>
+</table>
 
-@foreach($grouped as $category => $items)
-<div class="card" style="margin-bottom: 1.5rem">
-    <h2>{{ $category }}</h2>
-    <table class="data-table">
-        <thead><tr><th>Label</th><th>Hotkey</th><th>Descri&ccedil;&atilde;o</th></tr></thead>
-        <tbody>
-            @foreach($items as $t)
-            <tr>
-                <td><strong>{{ $t->label }}</strong></td>
-                <td><code>{{ $t->hotkey ?? '—' }}</code></td>
-                <td>{{ $t->description ?? '—' }}</td>
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
-</div>
-@endforeach
+{{ $cues->links() }}
 @endsection

@@ -1,14 +1,43 @@
 @extends('layouts.app')
 @section('title', 'Novo Praticante | LisThera')
-@section('page-title', 'Novo Praticante')
+@section('page-title', 'Cadastrar Praticante')
 @section('content')
-  <div class="panel" style="margin-bottom:16px"><h2>Cadastrar praticante</h2><p>Preencha os dados básicos do novo praticante.</p></div>
-  <form class="form" method="POST" action="{{ route('practitioners.store') }}">
+<form class="form" method="POST" action="{{ route('practitioners.store') }}">
     @csrf
-    <div class="field"><label>Nome completo</label><input type="text" name="name" placeholder="Nome do praticante" required></div>
-    <div class="field"><label>Data de nascimento</label><input type="date" name="birthdate" required></div>
-    <div class="field"><label>Diagnóstico (CID)</label><input type="text" name="diagnosis" placeholder="Ex: F84.0"></div>
-    <div class="field"><label>Responsável</label><input type="text" name="guardian" placeholder="Nome do responsável"></div>
-    <button type="submit" class="btn-primary">Salvar praticante</button>
-  </form>
+
+    <div class="field">
+        <label for="name">Nome completo *</label>
+        <input type="text" name="name" id="name" required value="{{ old('name') }}">
+    </div>
+
+    <div class="field">
+        <label for="birth_date">Data de nascimento</label>
+        <input type="date" name="birth_date" id="birth_date" value="{{ old('birth_date') }}">
+    </div>
+
+    <div class="field">
+        <label for="gender">Gênero</label>
+        <select name="gender" id="gender">
+            <option value="">Selecione...</option>
+            <option value="Masculino">Masculino</option>
+            <option value="Feminino">Feminino</option>
+            <option value="Outro">Outro</option>
+        </select>
+    </div>
+
+    <div class="field">
+        <label for="allergy">Alergias</label>
+        <input type="text" name="allergy" id="allergy" value="{{ old('allergy') }}" placeholder="Ex: Penicilina, pólen...">
+    </div>
+
+    <div class="field">
+        <label for="rfid_tag">Tag RFID</label>
+        <input type="text" name="rfid_tag" id="rfid_tag" value="{{ old('rfid_tag') }}" placeholder="Código da pulseira">
+    </div>
+
+    <div style="margin-top:16px">
+        <button type="submit" class="btn-primary">Salvar praticante</button>
+        <a href="{{ route('practitioners.index') }}" class="btn">Cancelar</a>
+    </div>
+</form>
 @endsection
