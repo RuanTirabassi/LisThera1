@@ -6,117 +6,83 @@ use App\Models\PsychologyAssessment;
 use App\Models\Practitioner;
 use App\Models\ArenaSession;
 use App\Models\Therapist;
+use Illuminate\Http\Request;
 
 class PsychologyAssessmentController extends Controller
 {
-    /**
-     * Relatório individual evolutivo do praticante — lista todas as avaliações.
-     */
-    public function report(Practitioner $practitioner)
+    public function index(Request $request)
     {
-        $assessments = PsychologyAssessment::with([
-                'therapist',
-                'arenaSession',
-                'cueLinks.cueEvent.template',
-            ])
-            ->where('practitioner_id', $practitioner->id)
-            ->orderBy('assessed_at')
-            ->get();
+        $query = PsychologyAssessment::with(['practitioner', 'therapist']);
 
-        // Séries para o gráfico evolutivo
-        $chartLabels = $assessments->map(fn ($a) =>
-            $a->assessed_at?->format('d/m/Y') ?? 'S/D'
-        );
-
-        $chartDomains = [
-            'Regulação Emocional' => $assessments->pluck('emotional_regulation'),
-            'Interação Social'    => $assessments->pluck('social_interaction'),
-            'Comunicação'         => $assessments->pluck('communication'),
-            'Atenção/Foco'        => $assessments->pluck('attention_focus'),
-            'Resposta Comportamental' => $assessments->pluck('behavioral_response'),
-            'Nível de Ansiedade'   => $assessments->pluck('anxiety_level'),
-            'Motivação'            => $assessments->pluck('motivation'),
-            'Autoestima'           => $assessments->pluck('self_esteem'),
-        ];
-
-        $overallSeries = $assessments->pluck('overall_score');
-
-        return view('assessments.psychology.report', compact(
-            'practitioner',
-            'assessments',
-            'chartLabels',
-            'chartDomains',
-            'overallSeries'
-        ));
-    }
-
-    /**
-     * Formulário de nova avaliação pós-sessão.
-     */
-    public function create(ArenaSession $session)
-    {
-        $session->load([
-            'sessionCheckin.practitioner',
-            'memoryCueEvents.template',
-        ]);
-
-        $practitioner = $session->sessionCheckin?->practitioner;
-
-        // Busca avaliação existente para esta sessão
-        $existing = PsychologyAssessment::where('arena_session_id', $session->id)->first();
-
-        return view('assessments.psychology.form', compact(
-            'session',
-            'practitioner',
-            'existing'
-        ));
-    }
-
-    /**
-     * Salva ou atualiza a avaliação.
-     */
-    public function store(ArenaSession $session)
-    {
-        $session->load('sessionCheckin.practitioner');
-        $practitioner = $session->sessionCheckin?->practitioner;
-
-        $data = request()->validate([
-            'therapist_id'           => 'required|exists:therapists,id',
-            'assessed_at'            => 'required|date',
-            'emotional_regulation'   => 'nullable|integer|min:0|max:10',
-            'social_interaction'     => 'nullable|integer|min:0|max:10',
-            'communication'          => 'nullable|integer|min:0|max:10',
-            'attention_focus'        => 'nullable|integer|min:0|max:10',
-            'behavioral_response'    => 'nullable|integer|min:0|max:10',
-            'anxiety_level'          => 'nullable|integer|min:0|max:10',
-            'motivation'             => 'nullable|integer|min:0|max:10',
-            'self_esteem'            => 'nullable|integer|min:0|max:10',
-            'overall_score'          => 'nullable|integer|min:0|max:100',
-            'evolution_notes'        => 'nullable|string',
-            'session_notes'          => 'nullable|string',
-            'cue_event_ids'          => 'nullable|array',
-            'cue_event_ids.*'        => 'exists:session_memory_cue_events,id',
-        ]);
-
-        $cueIds = $data['cue_event_ids'] ?? [];
-        unset($data['cue_event_ids']);
-
-        $data['arena_session_id'] = $session->id;
-        $data['practitioner_id']  = $practitioner?->id;
-
-        $assessment = PsychologyAssessment::updateOrCreate(
-            ['arena_session_id' => $session->id],
-            $data
-        );
-
-        // Sincroniza cue links
-        $assessment->cueLinks()->delete();
-        foreach ($cueIds as $cueId) {
-            $assessment->cueLinks()->create(['session_memory_cue_event_id' => $cueId]);
+        if ($request->filled('nome')) {
+            $query->whereHas('practitioner', function ($q) use ($request) {
+                $q->where('fullname', 'like', '%' . $request->nome . '%');
+            });
         }
 
-        return redirect()
-            ->route('psychology.report', $practitioner)
-            ->with('success', 'Avaliação salva com sucesso.');
+        if ($request->filled('data')) {
+            $query->whereDate('assessedat', $request->data);
+        }
+
+        $avaliacoes = $query->orderByDesc('assessedat')->paginate(15)->appends($request->only(['nome', 'data']));
+
+        return view('psychology.index', compact('avaliacoes'));
+    }
+
+    public function create()
+    {
+        $praticantes = Practitioner::orderBy('fullname')->get();
+        $terapeutas  = Therapist::orderBy('fullname')->get();
+        $sessoes     = ArenaSession::orderByDesc('id')->limit(50)->get();
+
+        return view('psychology.create', compact('praticantes', 'terapeutas', 'sessoes'));
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'practitionerid' => 'required|exists:practitioners,id',
+            'assessedat'     => 'required|date',
+        ]);
+
+        PsychologyAssessment::create($request->except('_token'));
+
+        return redirect()->route('psychology.index')->with('success', 'Avaliação psicológica salva com sucesso.');
+    }
+
+    public function show(PsychologyAssessment $psychology)
+    {
+        $psychology->load(['practitioner', 'therapist', 'arenaSession']);
+        return view('psychology.show', compact('psychology'));
+    }
+
+    public function edit(PsychologyAssessment $psychology)
+    {
+        $psychology->load(['practitioner', 'therapist']);
+        $praticantes = Practitioner::orderBy('fullname')->get();
+        $terapeutas  = Therapist::orderBy('fullname')->get();
+        $sessoes     = ArenaSession::orderByDesc('id')->limit(50)->get();
+
+        return view('psychology.edit', compact('psychology', 'praticantes', 'terapeutas', 'sessoes'));
+    }
+
+    public function update(Request $request, PsychologyAssessment $psychology)
+    {
+        $request->validate([
+            'practitionerid' => 'required|exists:practitioners,id',
+            'assessedat'     => 'required|date',
+        ]);
+
+        $psychology->update($request->except(['_token', '_method']));
+
+        return redirect()->route('psychology.index')->with('success', 'Avaliação atualizada com sucesso.');
+    }
+
+    public function destroy(PsychologyAssessment $psychology)
+    {
+        $psychology->cueLinks()->delete();
+        $psychology->delete();
+
+        return redirect()->route('psychology.index')->with('success', 'Avaliação excluída com sucesso.');
     }
 }
