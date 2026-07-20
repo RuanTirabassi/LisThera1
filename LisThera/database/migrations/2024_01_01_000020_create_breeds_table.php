@@ -5,10 +5,10 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
     public function up(): void {
-        Schema::create('roles', function (Blueprint $t) {
-            $t->bigIncrements('id');
+        Schema::create('breeds', function (Blueprint $t) {
+            $t->unsignedInteger('id')->autoIncrement();
             $t->string('name', 100)->unique();
         });
     }
-    public function down(): void { Schema::dropIfExists('roles'); }
+    public function down(): void { Schema::dropIfExists('breeds'); }
 };

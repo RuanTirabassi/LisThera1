@@ -5,10 +5,11 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
     public function up(): void {
-        Schema::create('roles', function (Blueprint $t) {
+        Schema::create('diagnosis_reference', function (Blueprint $t) {
             $t->bigIncrements('id');
-            $t->string('name', 100)->unique();
+            $t->string('code', 20)->unique();
+            $t->text('description');
         });
     }
-    public function down(): void { Schema::dropIfExists('roles'); }
+    public function down(): void { Schema::dropIfExists('diagnosis_reference'); }
 };
