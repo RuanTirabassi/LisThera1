@@ -10,23 +10,12 @@ return new class extends Migration
     {
         Schema::create('physiotherapy_assessment_cue_links', function (Blueprint $table) {
             $table->id();
-
-            $table->foreignId('physiotherapy_assessment_id')
-                  ->constrained('physiotherapy_assessments')
-                  ->onDelete('cascade');
-
-            $table->foreignId('session_memory_cue_event_id')
-                  ->constrained('session_memory_cue_events')
-                  ->onDelete('cascade');
-
-            $table->text('professional_justification')
-                  ->nullable()
-                  ->comment('Clinical/technical justification for keeping this cue');
-
+            $table->foreignId('physiotherapy_assessment_id')->constrained('physiotherapy_assessments')->onDelete('cascade');
+            $table->foreignId('session_memory_cue_event_id')->constrained('session_memory_cue_events')->onDelete('cascade');
+            $table->text('professional_justification')->nullable();
             $table->unsignedTinyInteger('intensity_score')->nullable();
-
             $table->timestamp('created_at')->nullable()->useCurrent();
-            $table->softDeletes(); // deleted_at
+            $table->softDeletes();
         });
     }
 

@@ -10,21 +10,10 @@ return new class extends Migration
     {
         Schema::create('pedagogy_assessment_cue_links', function (Blueprint $table) {
             $table->id();
-
-            $table->foreignId('pedagogy_assessment_id')
-                  ->constrained('pedagogy_assessments')
-                  ->onDelete('cascade');
-
-            $table->foreignId('session_memory_cue_event_id')
-                  ->constrained('session_memory_cue_events')
-                  ->onDelete('cascade');
-
-            $table->text('professional_justification')
-                  ->nullable()
-                  ->comment('Technical/clinical justification for keeping this cue in the final assessment');
-
+            $table->foreignId('pedagogy_assessment_id')->constrained('pedagogy_assessments')->onDelete('cascade');
+            $table->foreignId('session_memory_cue_event_id')->constrained('session_memory_cue_events')->onDelete('cascade');
+            $table->text('professional_justification')->nullable();
             $table->unsignedTinyInteger('intensity_score')->nullable();
-
             $table->timestamp('created_at')->nullable()->useCurrent();
         });
     }
