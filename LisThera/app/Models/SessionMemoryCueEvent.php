@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class SessionMemoryCueEvent extends Model
 {
@@ -10,21 +12,30 @@ class SessionMemoryCueEvent extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'arenasessionid', 'memorycuetemplateid',
-        'recordedat', 'notes',
+        'arenasessionid',
+        'arenaentityid',
+        'therapistid',
+        'memorycuetemplateid',
+        'recordedat',
+        'arenasessionmountid',
     ];
 
     protected $casts = [
         'recordedat' => 'datetime',
     ];
 
-    public function session()
-    {
-        return $this->belongsTo(ArenaSession::class, 'arenasessionid');
-    }
-
-    public function template()
+    public function memoryCueTemplate(): BelongsTo
     {
         return $this->belongsTo(MemoryCueTemplate::class, 'memorycuetemplateid');
+    }
+
+    public function therapist(): BelongsTo
+    {
+        return $this->belongsTo(Therapist::class, 'therapistid');
+    }
+
+    public function psychologyAssessmentCueLinks(): HasMany
+    {
+        return $this->hasMany(PsychologyAssessmentCueLink::class, 'sessionmemorycueeventid');
     }
 }

@@ -7,25 +7,29 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PsychologyAssessmentCueLink extends Model
 {
-    protected $table = 'psychology_assessment_cue_links';
+    protected $table = 'psychologyassessmentcuelinks';
+
+    // A tabela no BD usa createdat sem updated_at
+    public $timestamps = false;
 
     protected $fillable = [
-        'psychology_assessment_id',
-        'memory_cue_template_id',
-        'cue_label',
-        'cue_description',
-        'cue_type',
-        'intensity',
-        'therapist_notes',
+        'psychologyassessmentid',
+        'sessionmemorycueeventid',
+        'professionaljustification',
+        'intensityscore',
+    ];
+
+    protected $casts = [
+        'createdat' => 'datetime',
     ];
 
     public function psychologyAssessment(): BelongsTo
     {
-        return $this->belongsTo(PsychologyAssessment::class, 'psychology_assessment_id');
+        return $this->belongsTo(PsychologyAssessment::class, 'psychologyassessmentid');
     }
 
-    public function memoryCueTemplate(): BelongsTo
+    public function sessionMemoryCueEvent(): BelongsTo
     {
-        return $this->belongsTo(MemoryCueTemplate::class, 'memory_cue_template_id');
+        return $this->belongsTo(SessionMemoryCueEvent::class, 'sessionmemorycueeventid');
     }
 }

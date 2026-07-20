@@ -4,64 +4,81 @@ namespace App\Http\Controllers;
 
 use App\Models\PsychologyAssessment;
 use App\Models\PsychologyAssessmentCueLink;
-use App\Models\MemoryCueTemplate;
+use App\Models\SessionMemoryCueEvent;
 use Illuminate\Http\Request;
 
 class PsychologyAssessmentCueLinkController extends Controller
 {
-    // Lista os cues de uma avaliação
+    // Lista os cues vinculados à avaliação
     public function index(PsychologyAssessment $psychology)
     {
-        $cues      = $psychology->cueLinks()->with('memoryCueTemplate')->latest()->get();
-        $templates = MemoryCueTemplate::orderBy('label')->get();
+        $cues = PsychologyAssessmentCueLink::where('psychologyassessmentid', $psychology->id)
+            ->with(['sessionMemoryCueEvent.memoryCueTemplate', 'sessionMemoryCueEvent.therapist'])
+            ->orderByDesc('createdat')
+            ->get();
 
-        return view('psychology.cues.index', compact('psychology', 'cues', 'templates'));
+        // Eventos de memória disponíveis da mesma sessão da avaliação (para sugestão)
+        $availableEvents = SessionMemoryCueEvent::where('arenasessionid', $psychology->arenasessionid)
+            ->with('memoryCueTemplate')
+            ->orderByDesc('recordedat')
+            ->get();
+
+        return view('psychology.cues.index', compact('psychology', 'cues', 'availableEvents'));
     }
 
     // Formulário de criação
     public function create(PsychologyAssessment $psychology)
     {
-        $templates = MemoryCueTemplate::orderBy('label')->get();
-        return view('psychology.cues.create', compact('psychology', 'templates'));
+        // Eventos da mesma sessão de arena que ainda não foram vinculados
+        $linkedIds = PsychologyAssessmentCueLink::where('psychologyassessmentid', $psychology->id)
+            ->pluck('sessionmemorycueeventid');
+
+        $availableEvents = SessionMemoryCueEvent::where('arenasessionid', $psychology->arenasessionid)
+            ->whereNotIn('id', $linkedIds)
+            ->with('memoryCueTemplate')
+            ->orderByDesc('recordedat')
+            ->get();
+
+        return view('psychology.cues.create', compact('psychology', 'availableEvents'));
     }
 
-    // Salva novo cue
+    // Salva novo vínculo
     public function store(Request $request, PsychologyAssessment $psychology)
     {
         $data = $request->validate([
-            'memory_cue_template_id' => 'nullable|exists:memory_cue_templates,id',
-            'cue_label'              => 'nullable|string|max:120',
-            'cue_description'        => 'nullable|string',
-            'cue_type'               => 'required|in:visual,auditivo,tátil,verbal,outro',
-            'intensity'              => 'nullable|integer|min:1|max:5',
-            'therapist_notes'        => 'nullable|string',
+            'sessionmemorycueeventid'  => 'required|exists:sessionmemorycueevents,id',
+            'professionaljustification' => 'nullable|string',
+            'intensityscore'            => 'nullable|integer|min:1|max:10',
         ]);
 
-        $data['psychology_assessment_id'] = $psychology->id;
+        $data['psychologyassessmentid'] = $psychology->id;
+        $data['createdat'] = now();
+
         PsychologyAssessmentCueLink::create($data);
 
         return redirect()
             ->route('psychology.cues.index', $psychology)
-            ->with('success', 'Memory Cue adicionado com sucesso.');
+            ->with('success', 'Memory Cue vinculado com sucesso.');
     }
 
     // Formulário de edição
     public function edit(PsychologyAssessment $psychology, PsychologyAssessmentCueLink $cue)
     {
-        $templates = MemoryCueTemplate::orderBy('label')->get();
-        return view('psychology.cues.edit', compact('psychology', 'cue', 'templates'));
+        $availableEvents = SessionMemoryCueEvent::where('arenasessionid', $psychology->arenasessionid)
+            ->with('memoryCueTemplate')
+            ->orderByDesc('recordedat')
+            ->get();
+
+        return view('psychology.cues.edit', compact('psychology', 'cue', 'availableEvents'));
     }
 
-    // Atualiza cue
+    // Atualiza vínculo
     public function update(Request $request, PsychologyAssessment $psychology, PsychologyAssessmentCueLink $cue)
     {
         $data = $request->validate([
-            'memory_cue_template_id' => 'nullable|exists:memory_cue_templates,id',
-            'cue_label'              => 'nullable|string|max:120',
-            'cue_description'        => 'nullable|string',
-            'cue_type'               => 'required|in:visual,auditivo,tátil,verbal,outro',
-            'intensity'              => 'nullable|integer|min:1|max:5',
-            'therapist_notes'        => 'nullable|string',
+            'sessionmemorycueeventid'   => 'required|exists:sessionmemorycueevents,id',
+            'professionaljustification'  => 'nullable|string',
+            'intensityscore'             => 'nullable|integer|min:1|max:10',
         ]);
 
         $cue->update($data);
@@ -71,7 +88,7 @@ class PsychologyAssessmentCueLinkController extends Controller
             ->with('success', 'Memory Cue atualizado com sucesso.');
     }
 
-    // Remove cue
+    // Remove vínculo
     public function destroy(PsychologyAssessment $psychology, PsychologyAssessmentCueLink $cue)
     {
         $cue->delete();

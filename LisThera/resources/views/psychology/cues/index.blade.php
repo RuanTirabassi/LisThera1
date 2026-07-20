@@ -10,7 +10,7 @@
     </div>
     <div class="header-actions">
         <a href="{{ route('psychology.show', $psychology) }}" class="btn btn-ghost">← Voltar à Avaliação</a>
-        <a href="{{ route('psychology.cues.create', $psychology) }}" class="btn btn-primary">+ Novo Cue</a>
+        <a href="{{ route('psychology.cues.create', $psychology) }}" class="btn btn-primary">+ Vincular Cue</a>
     </div>
 </div>
 
@@ -25,9 +25,9 @@
             <path d="M9.663 17h4.673M12 3v1m6.364 1.636-.707.707M21 12h-1M4 12H3m3.343-5.657-.707-.707m2.828 9.9a5 5 0 1 1 7.072 0l-.548.547A3.374 3.374 0 0 0 14 18.469V19a2 2 0 1 1-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
         </svg>
     </div>
-    <h3>Nenhum Memory Cue cadastrado</h3>
-    <p>Adicione pistas de memória para orientar as sessões de equoterapia.</p>
-    <a href="{{ route('psychology.cues.create', $psychology) }}" class="btn btn-primary">+ Adicionar Cue</a>
+    <h3>Nenhum Memory Cue vinculado</h3>
+    <p>Vincule eventos de memória registrados na sessão de arena a esta avaliação.</p>
+    <a href="{{ route('psychology.cues.create', $psychology) }}" class="btn btn-primary">+ Vincular Cue</a>
 </div>
 @else
 <div class="card" style="margin-top:var(--space-4)">
@@ -35,46 +35,44 @@
         <table class="data-table">
             <thead>
                 <tr>
-                    <th>Rótulo / Template</th>
-                    <th>Tipo</th>
+                    <th>Template de Cue</th>
+                    <th>Registrado em</th>
+                    <th>Terapeuta</th>
                     <th>Intensidade</th>
-                    <th>Descrição</th>
-                    <th>Notas do Terapeuta</th>
+                    <th>Justificativa Profissional</th>
                     <th style="width:120px">Ações</th>
                 </tr>
             </thead>
             <tbody>
             @foreach($cues as $cue)
+            @php $event = $cue->sessionMemoryCueEvent; @endphp
             <tr>
                 <td>
-                    <strong>{{ $cue->cue_label ?: ($cue->memoryCueTemplate?->label ?? '—') }}</strong>
-                    @if($cue->memoryCueTemplate)
-                    <br><small class="text-muted">Template: {{ $cue->memoryCueTemplate->label }}</small>
+                    <strong>{{ $event?->memoryCueTemplate?->label ?? '—' }}</strong>
+                    @if($event?->memoryCueTemplate?->description)
+                    <br><small class="text-muted">{{ Str::limit($event->memoryCueTemplate->description, 60) }}</small>
                     @endif
                 </td>
+                <td>{{ $event?->recordedat?->format('d/m/Y H:i') ?? '—' }}</td>
+                <td>{{ $event?->therapist?->name ?? '—' }}</td>
                 <td>
-                    <span class="badge badge-{{ ['visual'=>'blue','auditivo'=>'green','tátil'=>'yellow','verbal'=>'purple','outro'=>'gray'][$cue->cue_type] ?? 'gray' }}">
-                        {{ ucfirst($cue->cue_type) }}
-                    </span>
-                </td>
-                <td>
-                    @if($cue->intensity)
+                    @if($cue->intensityscore)
                     <div class="intensity-dots">
-                        @for($i = 1; $i <= 5; $i++)
-                        <span class="dot {{ $i <= $cue->intensity ? 'dot-active' : '' }}"></span>
+                        @for($i = 1; $i <= 10; $i++)
+                        <span class="dot {{ $i <= $cue->intensityscore ? 'dot-active' : '' }}"></span>
                         @endfor
                     </div>
+                    <small class="text-muted">{{ $cue->intensityscore }}/10</small>
                     @else
                     <span class="text-muted">—</span>
                     @endif
                 </td>
-                <td style="max-width:240px">{{ Str::limit($cue->cue_description, 80) ?: '—' }}</td>
-                <td style="max-width:200px">{{ Str::limit($cue->therapist_notes, 60) ?: '—' }}</td>
+                <td style="max-width:260px">{{ Str::limit($cue->professionaljustification, 80) ?: '—' }}</td>
                 <td>
                     <div class="row-actions">
                         <a href="{{ route('psychology.cues.edit', [$psychology, $cue]) }}" class="btn btn-sm btn-warning">Editar</a>
                         <form method="POST" action="{{ route('psychology.cues.destroy', [$psychology, $cue]) }}"
-                              onsubmit="return confirm('Remover este Memory Cue?')">
+                              onsubmit="return confirm('Remover este vínculo?')">
                             @csrf @method('DELETE')
                             <button type="submit" class="btn btn-sm btn-danger">Remover</button>
                         </form>
@@ -95,14 +93,9 @@
 .empty-state{display:flex;flex-direction:column;align-items:center;text-align:center;padding:var(--space-16) var(--space-8);color:var(--color-text-muted);}
 .empty-state-icon{margin-bottom:var(--space-4);color:var(--color-text-faint);}
 .empty-state h3{color:var(--color-text);margin-bottom:var(--space-2);}
-.empty-state p{max-width:36ch;margin-bottom:var(--space-6);}
-.badge-blue{background:var(--color-blue-highlight);color:var(--color-blue);}
-.badge-green{background:var(--color-success-highlight);color:var(--color-success);}
-.badge-yellow{background:var(--color-gold-highlight);color:var(--color-gold);}
-.badge-purple{background:var(--color-purple-highlight);color:var(--color-purple);}
-.badge-gray{background:var(--color-surface-offset);color:var(--color-text-muted);}
-.intensity-dots{display:flex;gap:4px;align-items:center;}
-.dot{width:10px;height:10px;border-radius:50%;background:var(--color-border);}
+.empty-state p{max-width:40ch;margin-bottom:var(--space-6);}
+.intensity-dots{display:flex;gap:3px;align-items:center;flex-wrap:wrap;max-width:120px;}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--color-border);}
 .dot-active{background:var(--color-primary);}
 </style>
 @endsection

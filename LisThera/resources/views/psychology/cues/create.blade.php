@@ -1,125 +1,120 @@
 @extends('layouts.app')
 
-@section('title', 'Novo Memory Cue')
+@section('title', 'Vincular Memory Cue')
 
 @section('content')
 <div class="page-header">
     <div>
-        <h1>Novo Memory Cue</h1>
+        <h1>Vincular Memory Cue</h1>
         <span class="text-muted">{{ $psychology->practitioner?->fullname ?? '—' }} · Avaliação Psicológica</span>
     </div>
     <a href="{{ route('psychology.cues.index', $psychology) }}" class="btn btn-ghost">← Voltar</a>
 </div>
 
+@if($availableEvents->isEmpty())
+<div class="empty-state" style="margin-top:var(--space-4)">
+    <div class="empty-state-icon">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 8v4m0 4h.01"/>
+        </svg>
+    </div>
+    <h3>Nenhum evento disponível</h3>
+    <p>Não há eventos de memória registrados na sessão de arena desta avaliação, ou todos já foram vinculados.</p>
+    <a href="{{ route('psychology.cues.index', $psychology) }}" class="btn btn-ghost">Voltar</a>
+</div>
+@else
 <div class="form-card">
     <form method="POST" action="{{ route('psychology.cues.store', $psychology) }}">
         @csrf
 
-        {{-- Template (opcional) --}}
+        {{-- Evento de Memória --}}
         <div class="form-group">
-            <label for="memory_cue_template_id">Template de Cue <span class="text-muted">(opcional)</span></label>
-            <select name="memory_cue_template_id" id="memory_cue_template_id" class="form-control" onchange="fillFromTemplate(this)">
-                <option value="">— Selecionar template —</option>
-                @foreach($templates as $tpl)
-                <option value="{{ $tpl->id }}"
-                    data-label="{{ $tpl->label }}"
-                    data-description="{{ $tpl->description ?? '' }}"
-                    data-type="{{ $tpl->cue_type ?? 'visual' }}"
-                    {{ old('memory_cue_template_id') == $tpl->id ? 'selected' : '' }}>
-                    {{ $tpl->label }}
+            <label for="sessionmemorycueeventid">Evento de Memória (Sessão #{{ $psychology->arenasessionid }}) *</label>
+            <select name="sessionmemorycueeventid" id="sessionmemorycueeventid" class="form-control" required
+                    onchange="updatePreview(this)">
+                <option value="">— Selecionar evento —</option>
+                @foreach($availableEvents as $event)
+                <option value="{{ $event->id }}"
+                    data-template="{{ $event->memoryCueTemplate?->label ?? 'Sem template' }}"
+                    data-desc="{{ $event->memoryCueTemplate?->description ?? '' }}"
+                    data-recorded="{{ $event->recordedat?->format('d/m/Y H:i') ?? '' }}"
+                    {{ old('sessionmemorycueeventid') == $event->id ? 'selected' : '' }}>
+                    {{ $event->memoryCueTemplate?->label ?? 'Evento #'.$event->id }}
+                    — {{ $event->recordedat?->format('d/m/Y H:i') ?? '' }}
                 </option>
                 @endforeach
             </select>
-            @error('memory_cue_template_id')<span class="form-error">{{ $message }}</span>@enderror
+            @error('sessionmemorycueeventid')<span class="form-error">{{ $message }}</span>@enderror
         </div>
 
-        <div class="form-row">
-            {{-- Rótulo --}}
-            <div class="form-group">
-                <label for="cue_label">Rótulo do Cue</label>
-                <input type="text" name="cue_label" id="cue_label" class="form-control"
-                       value="{{ old('cue_label') }}" maxlength="120"
-                       placeholder="Ex: Música de entrada, Toque no dorso...">
-                @error('cue_label')<span class="form-error">{{ $message }}</span>@enderror
-            </div>
-
-            {{-- Tipo --}}
-            <div class="form-group">
-                <label for="cue_type">Tipo *</label>
-                <select name="cue_type" id="cue_type" class="form-control">
-                    @foreach(['visual','auditivo','tátil','verbal','outro'] as $tipo)
-                    <option value="{{ $tipo }}" {{ old('cue_type','visual') === $tipo ? 'selected' : '' }}>{{ ucfirst($tipo) }}</option>
-                    @endforeach
-                </select>
-                @error('cue_type')<span class="form-error">{{ $message }}</span>@enderror
-            </div>
+        {{-- Preview do evento selecionado --}}
+        <div id="event-preview" class="event-preview" style="display:none">
+            <p><strong id="prev-template"></strong></p>
+            <p id="prev-desc" class="text-muted"></p>
+            <small id="prev-recorded" class="text-muted"></small>
         </div>
 
         {{-- Intensidade --}}
         <div class="form-group">
-            <label>Intensidade <span class="text-muted">(1 = leve, 5 = forte)</span></label>
+            <label>Intensidade do Cue <span class="text-muted">(1 = muito leve — 10 = máxima)</span></label>
             <div class="intensity-picker">
-                @for($i = 1; $i <= 5; $i++)
+                @for($i = 1; $i <= 10; $i++)
                 <label class="intensity-opt">
-                    <input type="radio" name="intensity" value="{{ $i }}" {{ old('intensity') == $i ? 'checked' : '' }}>
+                    <input type="radio" name="intensityscore" value="{{ $i }}" {{ old('intensityscore') == $i ? 'checked' : '' }}>
                     <span class="intensity-btn">{{ $i }}</span>
                 </label>
                 @endfor
             </div>
-            @error('intensity')<span class="form-error">{{ $message }}</span>@enderror
+            @error('intensityscore')<span class="form-error">{{ $message }}</span>@enderror
         </div>
 
-        {{-- Descrição --}}
+        {{-- Justificativa --}}
         <div class="form-group">
-            <label for="cue_description">Descrição / Instrução</label>
-            <textarea name="cue_description" id="cue_description" class="form-control" rows="3"
-                      placeholder="Descreva como aplicar este cue durante a sessão...">{{ old('cue_description') }}</textarea>
-            @error('cue_description')<span class="form-error">{{ $message }}</span>@enderror
-        </div>
-
-        {{-- Notas do Terapeuta --}}
-        <div class="form-group">
-            <label for="therapist_notes">Notas do Psicólogo</label>
-            <textarea name="therapist_notes" id="therapist_notes" class="form-control" rows="3"
-                      placeholder="Observações clínicas, reações esperadas...">{{ old('therapist_notes') }}</textarea>
-            @error('therapist_notes')<span class="form-error">{{ $message }}</span>@enderror
+            <label for="professionaljustification">Justificativa Clínica / Profissional</label>
+            <textarea name="professionaljustification" id="professionaljustification" class="form-control" rows="4"
+                      placeholder="Descreva a justificativa clínica para incluir este cue na avaliação...">{{ old('professionaljustification') }}</textarea>
+            @error('professionaljustification')<span class="form-error">{{ $message }}</span>@enderror
         </div>
 
         <div class="form-actions">
             <a href="{{ route('psychology.cues.index', $psychology) }}" class="btn btn-ghost">Cancelar</a>
-            <button type="submit" class="btn btn-primary">Salvar Cue</button>
+            <button type="submit" class="btn btn-primary">Vincular Cue</button>
         </div>
     </form>
 </div>
+@endif
 
 <style>
 .form-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-8);max-width:720px;margin-top:var(--space-4);}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);}
-.form-group{display:flex;flex-direction:column;gap:var(--space-1);margin-bottom:var(--space-4);}
+.form-group{display:flex;flex-direction:column;gap:var(--space-1);margin-bottom:var(--space-5);}
 .form-group label{font-size:var(--text-sm);font-weight:600;color:var(--color-text);}
 .form-control{border:1px solid var(--color-border);border-radius:var(--radius-md);padding:var(--space-2) var(--space-3);font-size:var(--text-sm);background:var(--color-surface-2);color:var(--color-text);transition:border-color var(--transition-interactive);}
 .form-control:focus{outline:none;border-color:var(--color-primary);}
 .form-error{font-size:var(--text-xs);color:var(--color-error);}
 .form-actions{display:flex;justify-content:flex-end;gap:var(--space-2);margin-top:var(--space-4);}
-.intensity-picker{display:flex;gap:var(--space-2);}
+.intensity-picker{display:flex;gap:var(--space-2);flex-wrap:wrap;}
 .intensity-opt input{display:none;}
-.intensity-btn{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:var(--radius-md);border:2px solid var(--color-border);cursor:pointer;font-weight:700;font-size:var(--text-sm);transition:all var(--transition-interactive);}
+.intensity-btn{display:flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:var(--radius-md);border:2px solid var(--color-border);cursor:pointer;font-weight:700;font-size:var(--text-sm);transition:all var(--transition-interactive);}
 .intensity-opt input:checked + .intensity-btn{background:var(--color-primary);border-color:var(--color-primary);color:#fff;}
 .intensity-btn:hover{border-color:var(--color-primary);}
-@media(max-width:600px){.form-row{grid-template-columns:1fr;}}
+.event-preview{background:var(--color-surface-offset);border:1px solid var(--color-border);border-radius:var(--radius-md);padding:var(--space-3) var(--space-4);margin-bottom:var(--space-4);}
+.event-preview p{margin:0 0 var(--space-1);font-size:var(--text-sm);}
+.empty-state{display:flex;flex-direction:column;align-items:center;text-align:center;padding:var(--space-16) var(--space-8);color:var(--color-text-muted);}
+.empty-state-icon{margin-bottom:var(--space-4);color:var(--color-text-faint);}
+.empty-state h3{color:var(--color-text);margin-bottom:var(--space-2);}
+.empty-state p{max-width:40ch;margin-bottom:var(--space-6);}
 </style>
 
 <script>
-function fillFromTemplate(sel) {
+function updatePreview(sel) {
     const opt = sel.options[sel.selectedIndex];
-    if (!opt.value) return;
-    const label = opt.dataset.label || '';
-    const desc  = opt.dataset.description || '';
-    const type  = opt.dataset.type || 'visual';
-    document.getElementById('cue_label').value = label;
-    document.getElementById('cue_description').value = desc;
-    const typeSelect = document.getElementById('cue_type');
-    for (let o of typeSelect.options) { if (o.value === type) { o.selected = true; break; } }
+    const preview = document.getElementById('event-preview');
+    if (!opt.value) { preview.style.display = 'none'; return; }
+    document.getElementById('prev-template').textContent = opt.dataset.template || '';
+    document.getElementById('prev-desc').textContent = opt.dataset.desc || '';
+    document.getElementById('prev-recorded').textContent = opt.dataset.recorded ? 'Registrado em: ' + opt.dataset.recorded : '';
+    preview.style.display = 'block';
 }
 </script>
 @endsection
