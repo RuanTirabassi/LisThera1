@@ -7,22 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 class Arena extends Model
 {
     protected $table = 'arenas';
-    protected $primaryKey = 'arenaid';
     public $timestamps = false;
 
-    protected $fillable = [
-        'name',
-        'description',
-        'isactive',
-    ];
+    protected $fillable = ['name', 'description', 'capacity'];
 
-    public function iotDevices()
+    public function sessions()
     {
-        return $this->hasMany(IotDevice::class, 'arenaid', 'arenaid');
-    }
-
-    public function arenaSessions()
-    {
-        return $this->hasMany(ArenaSession::class, 'arenaid', 'arenaid');
+        return $this->hasMany(ArenaSession::class, 'arenaid');
     }
 }

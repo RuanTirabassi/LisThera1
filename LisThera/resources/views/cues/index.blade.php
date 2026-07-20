@@ -1,14 +1,29 @@
 @extends('layouts.app')
-@section('title', 'Memory Cues | LisThera')
-@section('page-title', 'Memory Cues')
+
+@section('title', 'Memory Cue Templates')
+
 @section('content')
-  <div class="panel" style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap">
-    <div><h2>Eventos da sessão</h2><p>Observações rápidas registradas durante a sessão.</p></div>
-    <div class="segmented"><span class="active">Hoje</span><span>Sessão</span><span>Histórico</span></div>
-  </div>
-  <div class="cue-grid">
-    <div class="cue"><div><strong>Postura ajustada</strong><p>08:12 • Alinhamento corporal</p></div><span class="badge">Positivo</span></div>
-    <div class="cue"><div><strong>Contato visual</strong><p>08:18 • Resposta ao comando</p></div><span class="badge">Positivo</span></div>
-    <div class="cue"><div><strong>Fadiga aparente</strong><p>08:26 • Pausa recomendada</p></div><span class="badge" style="background:#fce8e8;color:#a12c2c">Atenção</span></div>
-  </div>
+<div class="page-header">
+    <h1>Memory Cue Templates</h1>
+</div>
+
+@php $grouped = $templates->groupBy('category'); @endphp
+
+@foreach($grouped as $category => $items)
+<div class="card" style="margin-bottom: 1.5rem">
+    <h2>{{ $category }}</h2>
+    <table class="data-table">
+        <thead><tr><th>Label</th><th>Hotkey</th><th>Descri&ccedil;&atilde;o</th></tr></thead>
+        <tbody>
+            @foreach($items as $t)
+            <tr>
+                <td><strong>{{ $t->label }}</strong></td>
+                <td><code>{{ $t->hotkey ?? '—' }}</code></td>
+                <td>{{ $t->description ?? '—' }}</td>
+            </tr>
+            @endforeach
+        </tbody>
+    </table>
+</div>
+@endforeach
 @endsection

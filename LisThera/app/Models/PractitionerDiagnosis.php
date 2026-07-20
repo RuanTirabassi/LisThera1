@@ -7,24 +7,20 @@ use Illuminate\Database\Eloquent\Model;
 class PractitionerDiagnosis extends Model
 {
     protected $table = 'practitionerdiagnosis';
-    protected $primaryKey = 'diagnosisid';
     public $timestamps = false;
 
     protected $fillable = [
-        'practitionerid',
-        'diagnosisreferenceid',
-        'diagnosedby',
-        'diagnosisdate',
-        'notes',
+        'practitionerid', 'diagnosisreferenceid',
+        'diagnoseddate', 'notes',
     ];
 
     public function practitioner()
     {
-        return $this->belongsTo(Practitioner::class, 'practitionerid', 'practitionerid');
+        return $this->belongsTo(Practitioner::class, 'practitionerid');
     }
 
     public function diagnosisReference()
     {
-        return $this->belongsTo(DiagnosisReference::class, 'diagnosisreferenceid', 'diagnosisreferenceid');
+        return $this->belongsTo(DiagnosisReference::class, 'diagnosisreferenceid');
     }
 }

@@ -7,19 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 class PractitionerGuardian extends Model
 {
     protected $table = 'practitionerguardians';
-    protected $primaryKey = 'guardianid';
     public $timestamps = false;
 
     protected $fillable = [
-        'practitionerid',
-        'fullname',
-        'relationship',
-        'phone',
-        'email',
+        'practitionerid', 'fullname', 'relationship',
+        'phonenumber', 'email',
     ];
 
     public function practitioner()
     {
-        return $this->belongsTo(Practitioner::class, 'practitionerid', 'practitionerid');
+        return $this->belongsTo(Practitioner::class, 'practitionerid');
     }
 }

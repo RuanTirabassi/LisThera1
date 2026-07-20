@@ -7,19 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 class MemoryCueTemplate extends Model
 {
     protected $table = 'memorycuetemplates';
-    protected $primaryKey = 'templateid';
     public $timestamps = false;
 
-    protected $fillable = [
-        'name',
-        'specialty',
-        'hotkey',
-        'description',
-        'isactive',
-    ];
+    protected $fillable = ['label', 'category', 'description', 'hotkey'];
 
     public function events()
     {
-        return $this->hasMany(SessionMemoryCueEvent::class, 'templateid', 'templateid');
+        return $this->hasMany(SessionMemoryCueEvent::class, 'memorycuetemplateid');
     }
 }

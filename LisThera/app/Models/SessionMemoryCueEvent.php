@@ -7,23 +7,24 @@ use Illuminate\Database\Eloquent\Model;
 class SessionMemoryCueEvent extends Model
 {
     protected $table = 'sessionmemorycueevents';
-    protected $primaryKey = 'eventid';
     public $timestamps = false;
 
     protected $fillable = [
-        'arenasessionid',
-        'templateid',
-        'recordedat',
-        'notes',
+        'arenasessionid', 'memorycuetemplateid',
+        'recordedat', 'notes',
+    ];
+
+    protected $casts = [
+        'recordedat' => 'datetime',
     ];
 
     public function session()
     {
-        return $this->belongsTo(ArenaSession::class, 'arenasessionid', 'arenasessionid');
+        return $this->belongsTo(ArenaSession::class, 'arenasessionid');
     }
 
     public function template()
     {
-        return $this->belongsTo(MemoryCueTemplate::class, 'templateid', 'templateid');
+        return $this->belongsTo(MemoryCueTemplate::class, 'memorycuetemplateid');
     }
 }

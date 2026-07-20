@@ -7,12 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 class DiagnosisReference extends Model
 {
     protected $table = 'diagnosisreference';
-    protected $primaryKey = 'diagnosisreferenceid';
     public $timestamps = false;
 
-    protected $fillable = [
-        'code',
-        'description',
-        'category',
-    ];
+    protected $fillable = ['name', 'code', 'description'];
+
+    public function practitionerDiagnoses()
+    {
+        return $this->hasMany(PractitionerDiagnosis::class, 'diagnosisreferenceid');
+    }
 }

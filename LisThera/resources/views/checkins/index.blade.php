@@ -1,14 +1,52 @@
 @extends('layouts.app')
-@section('title', 'Triagem | LisThera')
-@section('page-title', 'Triagem')
+
+@section('title', 'Triagem')
+
 @section('content')
-  <div class="panel" style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap">
-    <div><h2>Check-ins do dia</h2><p>Acompanhe os check-ins antes de cada sessão.</p></div>
-    <div class="actions"><a href="{{ route('checkins.create') }}">+ Novo check-in</a></div>
-  </div>
-  <div class="timeline">
-    <div class="event"><div><strong>Maria Silva</strong><p>Entrada confirmada às 08:10</p></div><span class="badge">Apto</span></div>
-    <div class="event"><div><strong>João Pedro</strong><p>Em avaliação às 08:25</p></div><span class="badge">Pendente</span></div>
-    <div class="event"><div><strong>Ana Luiza</strong><p>Não compareceu</p></div><span class="badge" style="background:#fce8e8;color:#a12c2c">Ausente</span></div>
-  </div>
+<div class="page-header">
+    <h1>Triagem (Check-ins)</h1>
+    <a href="{{ route('checkins.create') }}" class="btn btn-primary">+ Novo check-in</a>
+</div>
+
+<div class="card">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Praticante</th>
+                <th>Data/Hora</th>
+                <th>P.A.</th>
+                <th>FC</th>
+                <th>Dor</th>
+                <th>Humor</th>
+                <th>Mobilidade</th>
+                <th>Autorizado</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse($checkins as $c)
+            <tr>
+                <td><a href="{{ route('practitioners.show', $c->practitioner?->id) }}">{{ $c->practitioner?->fullname ?? '—' }}</a></td>
+                <td>{{ $c->checkedat?->format('d/m/Y H:i') }}</td>
+                <td>{{ $c->bloodpressuresys ?? '?' }}/{{ $c->bloodpressuredia ?? '?' }}</td>
+                <td>{{ $c->heartrate ?? '—' }} bpm</td>
+                <td>{{ $c->painlevel ?? '—' }}/10</td>
+                <td>{{ $c->moodrating ?? '—' }}/5</td>
+                <td>{{ $c->mobilityrating ?? '—' }}/5</td>
+                <td>
+                    @if($c->sessionauthorized)
+                        <span class="badge badge-green">Sim</span>
+                    @else
+                        <span class="badge badge-red">N&atilde;o</span>
+                    @endif
+                </td>
+                <td><a href="{{ route('checkins.show', $c->id) }}" class="btn btn-sm">Ver</a></td>
+            </tr>
+            @empty
+            <tr><td colspan="9" class="empty">Nenhum check-in registrado.</td></tr>
+            @endforelse
+        </tbody>
+    </table>
+    <div class="pagination-wrap">{{ $checkins->links() }}</div>
+</div>
 @endsection

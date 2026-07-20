@@ -7,25 +7,23 @@ use Illuminate\Database\Eloquent\Model;
 class SessionCheckin extends Model
 {
     protected $table = 'sessioncheckins';
-    protected $primaryKey = 'sessioncheckinid';
     public $timestamps = false;
 
     protected $fillable = [
-        'practitionerid',
-        'checkindate',
-        'bloodpressure',
-        'heartrate',
-        'temperature',
-        'oxygensaturation',
-        'pain',
-        'mood',
-        'authorized',
-        'authorizednotes',
-        'recordedby',
+        'practitionerid', 'checkedat',
+        'bloodpressuresys', 'bloodpressuredia',
+        'heartrate', 'temperature', 'oxygensaturation',
+        'painlevel', 'mobilityrating', 'moodrating',
+        'sessionauthorized', 'authorizationnotes',
+    ];
+
+    protected $casts = [
+        'checkedat'          => 'datetime',
+        'sessionauthorized'  => 'boolean',
     ];
 
     public function practitioner()
     {
-        return $this->belongsTo(Practitioner::class, 'practitionerid', 'practitionerid');
+        return $this->belongsTo(Practitioner::class, 'practitionerid');
     }
 }

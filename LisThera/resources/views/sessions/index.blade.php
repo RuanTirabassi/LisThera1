@@ -1,13 +1,50 @@
 @extends('layouts.app')
-@section('title', 'Sessões | LisThera')
-@section('page-title', 'Sessões')
+
+@section('title', 'Sess&otilde;es de Arena')
+
 @section('content')
-  <div class="panel" style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap">
-    <div><h2>Sessões de hoje</h2><p>Acompanhe o andamento das sessões na arena.</p></div>
-    <div class="actions"><a href="{{ route('sessions.create') }}">+ Nova sessão</a></div>
-  </div>
-  <div class="timeline">
-    <div class="event"><div><strong>Maria Silva + Dra. Camila + Estrela</strong><p>Arena 1 • 08:00–08:45</p></div><span class="badge">Concluída</span></div>
-    <div class="event"><div><strong>João Pedro + Dr. Lucas + Trovão</strong><p>Arena 2 • 09:00–09:45</p></div><span class="badge" style="background:#fff3e0;color:#a05a00">Em andamento</span></div>
-  </div>
+<div class="page-header">
+    <h1>Sess&otilde;es de Arena</h1>
+    <a href="{{ route('sessions.create') }}" class="btn btn-primary">+ Nova sess&atilde;o</a>
+</div>
+
+<div class="card">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Praticante</th>
+                <th>Terapeuta</th>
+                <th>Arena</th>
+                <th>In&iacute;cio</th>
+                <th>T&eacute;rmino</th>
+                <th>Dura&ccedil;&atilde;o</th>
+                <th>Status</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse($sessions as $s)
+            <tr>
+                <td><a href="{{ route('practitioners.show', $s->practitioner?->id) }}">{{ $s->practitioner?->fullname ?? '—' }}</a></td>
+                <td>{{ $s->therapist?->fullname ?? '—' }}</td>
+                <td>{{ $s->arena?->name ?? '—' }}</td>
+                <td>{{ $s->startedat?->format('d/m/Y H:i') }}</td>
+                <td>{{ $s->endedat?->format('H:i') ?? '—' }}</td>
+                <td>{{ $s->duration }} min</td>
+                <td>
+                    @if($s->is_active)
+                        <span class="badge badge-green">Ativa</span>
+                    @else
+                        <span class="badge badge-gray">Encerrada</span>
+                    @endif
+                </td>
+                <td><a href="{{ route('sessions.show', $s->id) }}" class="btn btn-sm">Ver</a></td>
+            </tr>
+            @empty
+            <tr><td colspan="8" class="empty">Nenhuma sess&atilde;o encontrada.</td></tr>
+            @endforelse
+        </tbody>
+    </table>
+    <div class="pagination-wrap">{{ $sessions->links() }}</div>
+</div>
 @endsection

@@ -7,46 +7,52 @@ use Illuminate\Database\Eloquent\Model;
 class ArenaSession extends Model
 {
     protected $table = 'arenasessions';
-    protected $primaryKey = 'arenasessionid';
     public $timestamps = false;
 
     protected $fillable = [
-        'practitionerid',
-        'arenaid',
-        'sessioncheckinid',
-        'startedat',
-        'endedat',
-        'status',
-        'notes',
+        'practitionerid', 'therapistid', 'arenaid',
+        'startedat', 'endedat', 'notes',
+    ];
+
+    protected $casts = [
+        'startedat' => 'datetime',
+        'endedat'   => 'datetime',
     ];
 
     public function practitioner()
     {
-        return $this->belongsTo(Practitioner::class, 'practitionerid', 'practitionerid');
+        return $this->belongsTo(Practitioner::class, 'practitionerid');
+    }
+
+    public function therapist()
+    {
+        return $this->belongsTo(Therapist::class, 'therapistid');
     }
 
     public function arena()
     {
-        return $this->belongsTo(Arena::class, 'arenaid', 'arenaid');
-    }
-
-    public function sessionCheckin()
-    {
-        return $this->belongsTo(SessionCheckin::class, 'sessioncheckinid', 'sessioncheckinid');
-    }
-
-    public function entities()
-    {
-        return $this->hasMany(ArenaSessionEntity::class, 'arenasessionid', 'arenasessionid');
+        return $this->belongsTo(Arena::class, 'arenaid');
     }
 
     public function mounts()
     {
-        return $this->hasMany(ArenaSessionMount::class, 'arenasessionid', 'arenasessionid');
+        return $this->hasMany(ArenaSessionMount::class, 'arenasessionid');
     }
 
     public function memoryCueEvents()
     {
-        return $this->hasMany(SessionMemoryCueEvent::class, 'arenasessionid', 'arenasessionid');
+        return $this->hasMany(SessionMemoryCueEvent::class, 'arenasessionid');
+    }
+
+    public function getIsActiveAttribute()
+    {
+        return is_null($this->endedat);
+    }
+
+    public function getDurationAttribute()
+    {
+        if (!$this->startedat) return null;
+        $end = $this->endedat ?? now();
+        return $this->startedat->diffInMinutes($end);
     }
 }
