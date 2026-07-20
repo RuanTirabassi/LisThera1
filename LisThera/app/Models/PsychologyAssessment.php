@@ -6,14 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class PsychologyAssessment extends Model
 {
-    protected $table = 'psychologyassessments';
+    protected $table = 'psychology_assessments';
     public $timestamps = false;
 
     protected $fillable = [
-        'practitionerid',
-        'arenasessionid',
-        'therapistid',
-        'assessedat',
+        'id',
+        'practitioner_id',
+        'arena_session_id',
+        'therapist_id',
+        'assessment_date',
         // Domínios clínicos
         'emotionalregulation',
         'socialinteraction',
